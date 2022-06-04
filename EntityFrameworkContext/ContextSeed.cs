@@ -26,6 +26,7 @@ namespace EFCore.Context
                 EmailConfirmed = false,
                 PhoneNumberConfirmed = false,
                 TC = "",
+                PictureUrl = "",
                 DefaultRole =""
 
                 //Password = "hKaoJdFbclk=",/*123456*/
@@ -44,6 +45,7 @@ namespace EFCore.Context
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 TC = "-1",
+                PictureUrl = "",
                 DefaultRole = "Admin"
             };
             users.Add(Admin);
@@ -59,6 +61,7 @@ namespace EFCore.Context
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 TC = "12345678910",
+                PictureUrl = "",
                 DefaultRole = "User"
             };
             users.Add(student);
@@ -75,6 +78,7 @@ namespace EFCore.Context
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 TC = "12345678911",
+                PictureUrl = "",
                 DefaultRole = "User"
             };
             users.Add(student2);
@@ -84,12 +88,25 @@ namespace EFCore.Context
                 var userEntity = await userManager.FindByEmailAsync(usr.Email);
                 if (userEntity == null)
                 {
-                    var result = await userManager.CreateAsync(usr, "Sifre%5");
+                    try
+                    {
+                        var result = await userManager.CreateAsync(usr, "Sifre%5");
+                        if (result.Succeeded && !String.IsNullOrEmpty(usr.DefaultRole))
+                        {
+                            await userManager.AddToRoleAsync(usr, usr.DefaultRole);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        //throw e;
+                    }
+                   /* var result = await userManager.CreateAsync(usr, "Sifre%5");
                     if (result.Succeeded && !String.IsNullOrEmpty(usr.DefaultRole))
                     {
                         await userManager.AddToRoleAsync(usr, usr.DefaultRole);
                     }
-
+                   */
                 }
             }
 

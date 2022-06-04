@@ -1,0 +1,497 @@
+﻿@using Business.DTO
+@{
+    ViewData["Title"] = "Kullanıcı İşlemleri";
+    Layout = "_LayoutTheme";
+}
+@model UserRoleDTO
+<head>
+    <link rel="stylesheet" type="text/css" href="~/lib/DataTable/datatables.min.css" />
+</head>
+
+<div class="row" style="margin-top:50px; margin-bottom:50px;">
+    <div class="col-md-10">
+        <p id="pPageMesaj"></p>
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-info btnAdd"> + Yeni Kullanıcı</button>
+    </div>
+</div>
+
+
+
+<table id="UserListTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Adı</th>
+            <th scope="col">Soyadı</th>
+            <th scope="col">T.C. Kimlik No</th>
+            <th scope="col">Doğum Tarihi</th>
+            <th scope="col">Kullanıcı Adı</th>
+            <th scope="col">EPosta</th>
+            <th scope="col">Telefon</th>
+            <th scope="col">Rol</th>
+            <th scope="col"></th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td class="FirstName">@user.FirstName</td>
+                <td class="LastName">@user.LastName</td>
+                <td class="TC">@user.TC</td>
+                <td class="BirthDate">@user.BirthDate.ToString("dd-MM-yyyy")</td>
+                <td class="UserName">@user.UserName</td>
+                <td class="Email">@user.Email</td>
+                <td class="PhoneNumber">@user.PhoneNumber</td>
+                <td class="Roles">@String.Join(",", user.Roles.Select(x => x.Name).ToList())</td>
+                <td>
+                    <button type="button" class="btn btn-primary btnUpdate" data-userid="@user.Id">Güncelle</button>
+                    <button type="button" class="btn btn-danger btnDelete" data-userid="@user.Id">Sil</button>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+<!-- Modal Add -->
+<div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="UserAddForm">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Yeni kullanıcı</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    @Html.HiddenFor(model=>model.UserForAdd.Id,new { @value = 0 })
+
+                    <div class="form-group">
+                        <label>Ad</label>
+                        <input asp-for="@Model.UserForAdd.FirstName" id="FirstNameForAdd" type="text" class="form-control" placeholder="Kullanıcı Ad">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad</label>
+                        <input asp-for="@Model.UserForAdd.LastName" id="LastNameForAdd" type="text" class="form-control" placeholder="Kullanıcı Soyadı">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.LastName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>T.C. Kimlik Numarası</label>
+                        <input asp-for="@Model.UserForAdd.TC" id="TCForAdd" type="text" class="form-control" placeholder="T.C. Kimlik No">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.TC, "", new { @class = "text-danger" })
+                    </div>
+                       <div class="form-group">
+                        <label>Doğum Tarihi</label>
+                        <input asp-for="@Model.UserForAdd.BirthDate" id="BirthDateForAdd" type="text" class="form-control" placeholder="Doğum Tarihi">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.BirthDate, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input asp-for="@Model.UserForAdd.UserName" id="UserNameForAdd" type="text" class="form-control" placeholder="Kullanıcıadı">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.UserName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>EPosta</label>
+                        <input asp-for="@Model.UserForAdd.Email" id="EmailForAdd" type="text" class="form-control" placeholder="Kullanıcı Eposta">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.Email, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon Numarası</label>
+                        <input asp-for="@Model.UserForAdd.PhoneNumber" id="PhoneNumberForAdd" type="text" class="form-control" placeholder="Kullanıcı Telefon">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Şifre</label>
+
+                        <input asp-for="@Model.UserForAdd.Password" id="PasswordForAdd" type="text" class="form-control" placeholder="Kullanıcı Şifresi" value="Sifre%5">
+                        @Html.ValidationMessageFor(model => model.UserForAdd.Password, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol</label>
+
+                        <select asp-for="@Model.UserForAdd.RoleSelected" id="RoleSelectedForAdd" class="form-control">
+                            @foreach (RoleDTO item in @ViewBag.AllRoles)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div style="min-height:40px">
+                        <p id="pAddMesajiModal"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-info" id="btnAddSubmit">Ekle</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="Role_User_Id" value="@ViewBag.RoleUserId" />
+
+<!-- Modal Update -->
+<div class="modal fade" id="modalUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="UserUpdateForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Kullanıcı Güncelle</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    @*asp-controller="User" asp-action="Login" method="post"*@
+                    @Html.AntiForgeryToken()
+                    @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+
+                    <input asp-for="@Model.UserForUpdate.Id" id="IdForUpdate" type="hidden" value="">
+
+                    <div class="form-group">
+                        <label>Ad</label>
+                        <input asp-for="@Model.UserForUpdate.FirstName" id="FirstNameForUpdate" type="text" class="form-control" placeholder="Kullanıcı Ad">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad</label>
+                        <input asp-for="@Model.UserForUpdate.LastName" id="LastNameForUpdate" type="text" class="form-control" placeholder="Kullanıcı Soyadı">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.LastName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>T.C. Kimlik Numarası</label>
+                        <input asp-for="@Model.UserForUpdate.TC" id="TCForUpdate" type="text" class="form-control" placeholder="T.C. Kimlik No">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.TC, "", new { @class = "text-danger" })
+                    </div>
+                        <div class="form-group">
+                        <label>Doğum Tarihi</label>
+                        <input asp-for="@Model.UserForUpdate.BirthDate" id="BirthDateForUpdate" type="text" class="form-control" placeholder="Doğum Tarihi">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.BirthDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input asp-for="@Model.UserForUpdate.UserName" id="UserNameForUpdate" type="text" class="form-control" placeholder="Kullanıcıadı">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.UserName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>EPosta</label>
+                        <input asp-for="@Model.UserForUpdate.Email" id="EmailForUpdate" type="text" class="form-control" placeholder="Kullanıcı Eposta">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.Email, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefon Numarası</label>
+                        <input asp-for="@Model.UserForUpdate.PhoneNumber" id="PhoneNumberForUpdate" type="text" class="form-control" placeholder="Kullanıcı Telefon">
+                        @Html.ValidationMessageFor(model => model.UserForUpdate.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol</label>
+
+                        <select asp-for="@Model.UserForUpdate.RoleSelected" id="RoleSelectedForUpdate" class="form-control">
+                            @foreach (RoleDTO item in @ViewBag.AllRoles)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div style="min-height:40px">
+                        <p id="pUpdateMesajiModal"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateSubmit">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/lib/DataTable/datatables.min.js"></script>
+
+    <script type="text/javascript">
+        var table;
+        var clickedRow;
+        $(document).ready(function () {
+            
+            //Data Table initilation
+            table = $('#UserListTable').DataTable({
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tümü"]],
+                //"language": {"url": "/lib/DataTable/Turkish.json"}
+                "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
+            });
+
+            $(".btnAdd").on("click", function () {
+       
+                modalEmptyForAdd();
+                //$('#modalAdd').modal();
+                var myModal = new bootstrap.Modal(document.getElementById('modalAdd'), {keyboard: false});
+                myModal.show();
+            });
+
+            $(document).on('click', '.btnUpdate', function () {
+         
+                clickedRow = $(this).parent();
+                let userid = $(this).data("userid");
+                modalEmptyForUpdate();
+                getUserForUpdate(userid);
+            });
+
+            $(document).on('click', '.btnDelete', function () {
+
+                if (confirm('Kullanıcı Silmek İstediğinizden Emin Misiniz?')) {
+                    clickedRow = $(this).parent();
+                    let userid = $(this).data("userid");
+                    deleteUser($(this), userid);
+                }
+            });
+
+            $("#btnAddSubmit").on("click", function (e) {
+                e.preventDefault();
+
+                $('#UserAddForm').validate();
+
+                if ($('#UserAddForm').valid()) {
+                    addUser();
+                }
+            });
+
+            $("#btnUpdateSubmit").on("click", function (e) {
+
+                e.preventDefault();
+
+                $('#UserUpdateForm').validate();
+
+                if ($('#UserUpdateForm').valid()) {
+                    updateUser();
+                }
+            });
+        });
+        function modalEmptyForAdd() {
+           //console.log("+");
+            $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+
+            $("#FirstNameForAdd").val("");
+            $("#LastNameForAdd").val("");
+            $("#TCForAdd").val("");
+            $("#BirthDateForAdd").val("");
+            $("#UserNameForAdd").val("");
+            $("#EmailForAdd").val("");
+            $("#PhoneNumberForAdd").val("");
+            $("#RoleSelectedForAdd").val($("#Role_User_Id").val());
+            $("#PasswordForAdd").val("Sirfe%5");
+             // console.log("++");
+        }
+        function modalEmptyForUpdate() {
+            $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+        }
+        function getUserForUpdate(userid) {
+            $.ajax({
+                type: 'POST',
+                url: '/User/Get',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: { UserId: userid },
+                success: function (result) {
+
+
+                    if (result.isSuccess) {
+                        $("#IdForUpdate").val(result.data.id);
+                        $("#FirstNameForUpdate").val(result.data.firstName);
+                        $("#LastNameForUpdate").val(result.data.lastName);
+                        $("#TCForUpdate").val(result.data.tc);
+                        $("#BirthDateForUpdate").val(result.data.birthDate);
+                        $("#UserNameForUpdate").val(result.data.userName);
+                        $("#EmailForUpdate").val(result.data.email);
+                        $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
+                        $("#RoleSelectedForUpdate").val(result.data.roles[0].id);
+
+
+
+                        //$('#modalUpdate').modal();
+                        var myModal = new bootstrap.Modal(document.getElementById('modalUpdate'), {keyboard: false});
+                        myModal.show();
+                    } else {
+
+                        $("#pUpdateMesajiModal").text(result.errorMessage);
+                        $("#pUpdateMesajiModal").css("color", "red");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                    $("#pUpdateMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pUpdateMesajiModal").css("color", "red");
+                }
+            })
+        }
+
+        var addSetTimeOutId;
+        function addUser() {
+            $("#pAddMesajiModal").text("");
+            var data = $("#UserAddForm").serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: '/User/Add',
+                dataType: 'json',
+                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: data,
+                success: function (result) {
+                    if (result.isSuccess) {
+
+                        $("#pAddMesajiModal").text(result.successMessage);
+                        $("#pAddMesajiModal").css("color", "green");                     
+
+                        table.row.add([
+                            $("#FirstNameForAdd").val(),
+                            $("#LastNameForAdd").val(),
+                            $("#TCForAdd").val(), 
+                            $("#BirthDateForAdd").val(),
+                            $("#UserNameForAdd").val(),
+                            $("#EmailForAdd").val(),
+                            $("#PhoneNumberForAdd").val(),
+                            $("#RoleSelectedForAdd option:selected").text(),
+                            "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + result.data + "'>Güncelle</button>" +
+                            "<button type='button' class='btn btn-danger btnDelete' data-userid='" + result.data + "'>Sil</button>"
+                        ]).draw();
+
+
+
+                        addSetTimeOutId = setTimeout(function () {
+                            $('#modalAdd').modal('hide');
+                            $("#pAddMesajiModal").text("");
+                        }, 2500);
+                    } else {
+
+                        $("#pAddMesajiModal").text(result.errorMessage);
+                        $("#pAddMesajiModal").css("color", "red");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                    $("#pAddMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pAddMesajiModal").css("color", "red");
+                }
+            })
+        }
+
+        //Add model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
+        $('#modalAdd').on('hide.bs.modal', function () {
+            $("#pAddMesajiModal").text("");
+            clearTimeout(addSetTimeOutId);
+        });
+
+        var updateSetTimeOutId;
+        function updateUser() {
+            $("#pUpdateMesajiModal").text("");
+            var data = $("#UserUpdateForm").serialize();
+            $.ajax({
+                type: 'POST',
+                url: '/User/Update',
+                dataType: 'json',
+                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: data,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        $("#pUpdateMesajiModal").text(result.successMessage);
+                        $("#pUpdateMesajiModal").css("color", "green");
+
+                        //var tableRow = table.row(clickedButton.parent());
+                        var rData = [
+                            $("#FirstNameForUpdate").val(),
+                            $("#LastNameForUpdate").val(),
+                            $("#TCForUpdate").val(),
+                            $("#BirthDateForUpdate").val(),
+                            $("#UserNameForUpdate").val(),
+                            $("#EmailForUpdate").val(),
+                            $("#PhoneNumberForUpdate").val(),
+                            $("#RoleSelectedForUpdate option:selected").text(),
+                            "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + $("#IdForUpdate").val() + "'>Güncelle</button>" +
+                            "<button type='button' class='btn btn-danger btnDelete' data-userid='" + $("#IdForUpdate").val() + "'>Sil</button>"
+                        ];
+
+
+                        table.row(clickedRow)
+                            .data(rData)
+                            .draw();
+
+
+                        updateSetTimeOutId = setTimeout(function () { $('#modalUpdate').modal('hide'), $("#pUpdateMesajiModal").text(""); }, 2500);
+                    } else {
+                        $("#pUpdateMesajiModal").text(result.errorMessage);
+                        $("#pUpdateMesajiModal").css("color", "red");
+                    }
+                },
+                error: function () {
+                    $("#pUpdateMesajiModal").text("İşlem sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pUpdateMesajiModal").css("color", "red");
+                }
+            })
+
+
+        }
+        //update model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
+        $('#modalUpdate').on('hide.bs.modal', function () {
+
+            $("#pUpdateMesajiModal").text("");
+            clearTimeout(updateSetTimeOutId);
+        });
+
+        function deleteUser(deleteButton, userid) {
+            $("#pPageMesaj").text("");
+
+            $.ajax({
+                type: 'POST',
+                url: '/User/Delete',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: { UserId: userid },
+                success: function (result) {
+                    if (result.isSuccess) {
+                        $("#pPageMesaj").text(result.successMessage);
+                        $("#pPageMesaj").css("color", "green");
+                        //deleteButton.parent().parent().remove();//satırı sil
+                        table.row(clickedRow)
+                            .remove()
+                            .draw();
+                        setTimeout(function () { $("#pPageMesaj").text(""); }, 3000);
+                    } else {
+                        $("#pPageMesaj").text(result.errorMessage);
+                        $("#pPageMesaj").css("color", "red");
+                    }
+                },
+                error: function () {
+                    $("#pPageMesaj").text("Silme işlemi sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pPageMesaj").css("color", "red");
+                }
+            })
+        }
+
+    </script>
+
+}
+
+

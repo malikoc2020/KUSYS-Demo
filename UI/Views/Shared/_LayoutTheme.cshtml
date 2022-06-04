@@ -73,7 +73,7 @@
                 <!-- sidebar-search  -->
                 <div class="sidebar-menu">
                     <ul>
-                        @if (String.Join(",", currentUserRoles).Contains("Manager"))
+                        @if (String.Join(",", currentUserRoles).Contains("Admin"))
                         {
 
 
@@ -90,7 +90,7 @@
                                 <div class="sidebar-submenu">
                                     <ul>
                                         <li>
-                                            <a href="/User/IdentityRoleList">
+                                            <a href="/User/UserRoleList">
                                                 Kimlik - Rol
                                                 @*    <span class="badge badge-pill badge-success">Pro</span>*@
                                             </a>
@@ -222,10 +222,10 @@
                     <i class="fa fa-bell"></i>
                     <span class="badge badge-pill badge-warning notification">3</span>
                 </a>*@
-                <a href="/Message/List">
+               @* <a href="/Message/List">
                     <i class="fa fa-envelope"></i>
                     <span id="messagelink" class="badge badge-pill badge-success notification"></span>
-                </a>
+                </a>*@
                 @* <a href="#">
                     <i class="fa fa-cog"></i>
                     <span class="badge-sonar"></span>
@@ -267,6 +267,7 @@
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+@*    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>*@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
@@ -276,10 +277,9 @@
  
 
  
-    <script type="text/javascript">
+@*    <script type="text/javascript">
         $(document).ready(function () {
         messageNotification();
-                //5 saniyede bir kontrol et mesaj geliyormu diye 
         setInterval(messageNotification, 5000);          
 
 
@@ -293,7 +293,6 @@
                     type: 'POST',
                     url: '/Message/GetUnLookedMessageCountForUser',
                     dataType: 'json',
-                    //data: data,
                     success: function (result) {
                         if (result.isSuccess) {                          
                            console.log(result.data);
@@ -314,7 +313,7 @@
                     }
                 })
         }
-    </script>
+    </script>*@
  
  
 

@@ -10,7 +10,7 @@ namespace Domain.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         [Column(TypeName = "Date"), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime BirdDate { get; set; }
+        public DateTime BirthDate { get; set; }
         public string PictureUrl { get; set; }
         public string TC { get; set; }
         [NotMapped]

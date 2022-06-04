@@ -17,7 +17,7 @@ namespace EFCore.Context.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Identity")
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -30,6 +30,10 @@ namespace EFCore.Context.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("CreatedUserId")
                         .HasColumnType("uniqueidentifier");
@@ -44,15 +48,50 @@ namespace EFCore.Context.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CourseCode")
+                        .IsUnique();
 
-                    b.ToTable("Cources", "Identity");
+                    b.ToTable("Cources", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CourseCode = "CSI101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5389),
+                            IsActive = true,
+                            Name = "Introduction to Computer Science"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CourseCode = "CSI102",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5399),
+                            IsActive = true,
+                            Name = "Algorithms"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CourseCode = "MAT101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5400),
+                            IsActive = true,
+                            Name = "Calculus"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CourseCode = "PHY101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5401),
+                            IsActive = true,
+                            Name = "Physics"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
@@ -166,6 +205,40 @@ namespace EFCore.Context.Migrations
                     b.ToTable("User", "Identity");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserCourse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreatedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId", "CourseId")
+                        .IsUnique();
+
+                    b.ToTable("UserCources", "dbo");
+                });
+
             modelBuilder.Entity("Domain.Entities.UserRole", b =>
                 {
                     b.Property<string>("UserId")
@@ -272,13 +345,21 @@ namespace EFCore.Context.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Course", b =>
+            modelBuilder.Entity("Domain.Entities.UserCourse", b =>
                 {
+                    b.HasOne("Domain.Entities.Course", "Course")
+                        .WithMany("CourseUsers")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "User")
                         .WithMany("UserCourses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("User");
                 });
@@ -336,6 +417,11 @@ namespace EFCore.Context.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Course", b =>
+                {
+                    b.Navigation("CourseUsers");
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>

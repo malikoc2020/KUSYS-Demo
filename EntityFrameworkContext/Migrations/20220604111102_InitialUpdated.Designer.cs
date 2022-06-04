@@ -12,18 +12,89 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCore.Context.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220604065947_initialization")]
-    partial class initialization
+    [Migration("20220604111102_InitialUpdated")]
+    partial class InitialUpdated
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Identity")
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Domain.Entities.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("CreatedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseCode")
+                        .IsUnique();
+
+                    b.ToTable("Cources", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CourseCode = "CSI101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5389),
+                            IsActive = true,
+                            Name = "Introduction to Computer Science"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CourseCode = "CSI102",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5399),
+                            IsActive = true,
+                            Name = "Algorithms"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CourseCode = "MAT101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5400),
+                            IsActive = true,
+                            Name = "Calculus"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CourseCode = "PHY101",
+                            CreatedUserId = new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"),
+                            DateCreated = new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5401),
+                            IsActive = true,
+                            Name = "Physics"
+                        });
+                });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
@@ -59,6 +130,9 @@ namespace EFCore.Context.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("BirdDate")
+                        .HasColumnType("Date");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -131,6 +205,40 @@ namespace EFCore.Context.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("User", "Identity");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserCourse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreatedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId", "CourseId")
+                        .IsUnique();
+
+                    b.ToTable("UserCources", "dbo");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserRole", b =>
@@ -239,6 +347,25 @@ namespace EFCore.Context.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserCourse", b =>
+                {
+                    b.HasOne("Domain.Entities.Course", "Course")
+                        .WithMany("CourseUsers")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("UserCourses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("Domain.Entities.Role", "Role")
@@ -294,6 +421,11 @@ namespace EFCore.Context.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.Course", b =>
+                {
+                    b.Navigation("CourseUsers");
+                });
+
             modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
                     b.Navigation("UserRoles");
@@ -301,6 +433,8 @@ namespace EFCore.Context.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
+                    b.Navigation("UserCourses");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

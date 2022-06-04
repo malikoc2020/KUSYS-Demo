@@ -5,12 +5,33 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EFCore.Context.Migrations
 {
-    public partial class initialization : Migration
+    public partial class InitialUpdated : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
+                name: "dbo");
+
+            migrationBuilder.EnsureSchema(
                 name: "Identity");
+
+            migrationBuilder.CreateTable(
+                name: "Cources",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CourseCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cources", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Role",
@@ -35,6 +56,7 @@ namespace EFCore.Context.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BirdDate = table.Column<DateTime>(type: "Date", nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TC = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -96,6 +118,38 @@ namespace EFCore.Context.Migrations
                     table.PrimaryKey("PK_UserClaims", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserClaims_User_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserCources",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCources_Cources_CourseId",
+                        column: x => x.CourseId,
+                        principalSchema: "dbo",
+                        principalTable: "Cources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserCources_User_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "User",
@@ -174,6 +228,25 @@ namespace EFCore.Context.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "Cources",
+                columns: new[] { "Id", "CourseCode", "CreatedUserId", "DateCreated", "IsActive", "Name" },
+                values: new object[,]
+                {
+                    { 1, "CSI101", new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"), new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5389), true, "Introduction to Computer Science" },
+                    { 2, "CSI102", new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"), new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5399), true, "Algorithms" },
+                    { 3, "MAT101", new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"), new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5400), true, "Calculus" },
+                    { 4, "PHY101", new Guid("f7882daa-fe0c-4fd1-9656-c2e9426c5fda"), new DateTime(2022, 6, 4, 14, 11, 2, 422, DateTimeKind.Local).AddTicks(5401), true, "Physics" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cources_CourseCode",
+                schema: "dbo",
+                table: "Cources",
+                column: "CourseCode",
+                unique: true);
+
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 schema: "Identity",
@@ -209,6 +282,19 @@ namespace EFCore.Context.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserCources_CourseId",
+                schema: "dbo",
+                table: "UserCources",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCources_UserId_CourseId",
+                schema: "dbo",
+                table: "UserCources",
+                columns: new[] { "UserId", "CourseId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
                 schema: "Identity",
                 table: "UserLogins",
@@ -232,6 +318,10 @@ namespace EFCore.Context.Migrations
                 schema: "Identity");
 
             migrationBuilder.DropTable(
+                name: "UserCources",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "UserLogins",
                 schema: "Identity");
 
@@ -242,6 +332,10 @@ namespace EFCore.Context.Migrations
             migrationBuilder.DropTable(
                 name: "UserTokens",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Cources",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Role",

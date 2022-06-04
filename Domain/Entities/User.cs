@@ -16,7 +16,14 @@ namespace Domain.Entities
         [NotMapped]
         public string DefaultRole { get; set; }
         public ICollection<UserRole> UserRoles { get; set; }
-        public ICollection<Course> UserCourses { get; set; }
+
+        public ICollection<UserCourse> UserCourses { get; set; }
+
+        //[ForeignKey("CourceId")]
+        //public string CourceId { get; set; }
+        //public Course Course { get; set; }
+
+        //public ICollection<Course> UserCourses { get; set; }
         //[InverseProperty("SendUser")]
         //public virtual ICollection<Message> SendedMessages { get; set; }
         //[InverseProperty("ReceiveUser")]

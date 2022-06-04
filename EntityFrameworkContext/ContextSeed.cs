@@ -6,6 +6,7 @@ namespace EFCore.Context
 {
     public class ContextSeed
     {
+        public static Guid TanimsizUserId = Guid.Parse("f7882daa-fe0c-4fd1-9656-c2e9426c5fda");
         public static async Task SeedRoleAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             await roleManager.CreateAsync(new Role(Roles.Admin.ToString()));
@@ -15,15 +16,15 @@ namespace EFCore.Context
         {
             List<User> users = new List<User>();
 
-            User tanimsiz = new User()
+            User SystemUser = new User()
             {
-                Id = Guid.NewGuid().ToString(),
-                FirstName = "Tanımsız",
-                LastName = "Tanimsiz",
-                UserName = "Tanimsiz",
+                Id = TanimsizUserId.ToString(),
+                FirstName = "System",
+                LastName = "System",
+                UserName = "System",
                 BirdDate = new DateTime(2000, 1, 1),
-                Email = "Tanimsiz@Tanimsiz.com",
-                PhoneNumber = "Tanimsiz",
+                Email = "System@System.com",
+                PhoneNumber = "System",
                 EmailConfirmed = false,
                 PhoneNumberConfirmed = false,
                 TC = "",
@@ -32,7 +33,7 @@ namespace EFCore.Context
 
                 //Password = "hKaoJdFbclk=",/*123456*/
             };
-            users.Add(tanimsiz);
+            users.Add(SystemUser);
 
 
             User Admin = new User()

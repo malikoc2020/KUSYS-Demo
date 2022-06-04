@@ -15,7 +15,7 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
 
         }
         public DbSet<Course> Courses { get; set; }
-        //public DbSet<Block> Blocks { get; set; }
+        public DbSet<UserCourse> UserCourses { get; set; }
         //public DbSet<Flat> Flats { get; set; }
         //public DbSet<FlatType> FlatTypes { get; set; }
         //public DbSet<UserType> UserTypes { get; set; }
@@ -25,7 +25,7 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
             base.OnModelCreating(builder);
             builder.HasDefaultSchema("dbo");
             builder.ApplyConfiguration(new CourseConfiguration());
-            //builder.ApplyConfiguration(new BlockConfiguration());
+            builder.ApplyConfiguration(new UserCourseConfiguration());
             //builder.ApplyConfiguration(new FlatConfiguration());
             //builder.ApplyConfiguration(new UserTypeConfiguration());
             //builder.ApplyConfiguration(new FlatTypeConfiguration());
@@ -34,34 +34,34 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
             //builder.ApplyConfiguration(new BillTypeConfiguration());
             //builder.ApplyConfiguration(new MessageConfiguration());
 
-            builder.HasDefaultSchema("Identity");
+            //builder.HasDefaultSchema("Identity");
             builder.Entity<User>(entity =>
             {
-                entity.ToTable("User");
+                entity.ToTable("User", "Identity");
             });
             builder.Entity<Role>(entity =>
             {
-                entity.ToTable("Role");
+                entity.ToTable("Role", "Identity");
             });
             builder.Entity<IdentityUserClaim<string>>(entity =>
             {
-                entity.ToTable("UserClaims");
+                entity.ToTable("UserClaims", "Identity");
             });
             builder.Entity<IdentityUserLogin<string>>(entity =>
             {
-                entity.ToTable("UserLogins");
+                entity.ToTable("UserLogins", "Identity");
             });
             builder.Entity<IdentityRoleClaim<string>>(entity =>
             {
-                entity.ToTable("RoleClaims");
+                entity.ToTable("RoleClaims", "Identity");
             });
             builder.Entity<IdentityUserToken<string>>(entity =>
             {
-                entity.ToTable("UserTokens");
+                entity.ToTable("UserTokens", "Identity");
             });
             builder.Entity<UserRole>(userRole =>
             {
-                userRole.ToTable("UserRoles");
+                userRole.ToTable("UserRoles", "Identity");
 
                 userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -74,5 +74,7 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
                     .HasForeignKey(ur => ur.UserId);
             });
         }
+
+     
     }
 }

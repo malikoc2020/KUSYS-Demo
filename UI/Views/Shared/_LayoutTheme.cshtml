@@ -1,0 +1,326 @@
+﻿@using Domain.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> _signInManager
+@inject UserManager<User> _userManager
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UI</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/LeftMenuTheme.css" />
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+</head>
+<body>
+    @{
+        var currentUser = _userManager.GetUserAsync(User).Result;
+        var currentUserRoles = _userManager.GetRolesAsync(currentUser).Result;
+
+    }
+
+    <div class="page-wrapper chiller-theme toggled">
+        <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+            <i class="fas fa-bars"></i>
+        </a>
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-brand">
+                    <a href="/Home/Index" style="text-align:center;">Menü</a>
+                    <div id="close-sidebar">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div class="sidebar-header">
+                    <div class="user-pic">
+                        @if (String.IsNullOrEmpty(@currentUser.PictureUrl))
+                        {
+                            <img class="img-responsive img-rounded" src="~/images/EmptyUser.png" alt="User picture">
+                        }
+                        else
+                        {
+                            <img class="img-responsive img-rounded" src="@currentUser.PictureUrl" alt="User picture">
+                        }
+
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">
+                            @currentUser?.FirstName
+                            <strong> @currentUser?.LastName</strong>
+                        </span>
+                        <span class="user-role">@String.Join(",",currentUserRoles)</span>
+                        <span class="user-status">
+                            <i class="fa fa-circle"></i>
+                            <span>Online</span>
+                        </span>
+                    </div>
+                </div>
+                <!-- sidebar-header  -->
+                @*      <div class="sidebar-search">
+                    <div>
+                    <div class="input-group">
+                    <input type="text" class="form-control search-menu" placeholder="Search...">
+                    <div class="input-group-append">
+                    <span class="input-group-text">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    </span>
+                    </div>
+                    </div>
+                    </div>
+                    </div>*@
+                <!-- sidebar-search  -->
+                <div class="sidebar-menu">
+                    <ul>
+                        @if (String.Join(",", currentUserRoles).Contains("Manager"))
+                        {
+
+
+
+                            <li class="header-menu">
+                                <span>Yönetici</span>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-users"></i>
+                                    <span>Kullanıcı İşlemleri</span>
+                                    @* <span class="badge badge-pill badge-warning">New</span>*@
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a href="/User/IdentityRoleList">
+                                                Kimlik - Rol
+                                                @*    <span class="badge badge-pill badge-success">Pro</span>*@
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="/User/UserCarList">Araç</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-home"></i>
+                                    <span>Konut/Daire İşlemleri</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a href="/Residence/BlockList">Blok</a>
+                                        </li>
+                                        <li>
+                                            <a href="/Residence/FlatList">Daire</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-chart-line"></i>
+                                    <span>Fatura işlemleri</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a href="/Bill/Index">Fatura Ekle-Dağıt</a>
+                                        </li>
+                                        <li>
+                                            <a href="/Bill/BillList?Yearid=-1&Mountid=-1&BillTypeid=0&isPaidid=-1">Genel Fatura Durumu</a>
+                                        </li>
+                                        <li>
+                                            <a href="/Bill/BillSummory?Yearid=-1&Mountid=-1&BillTypeid=0">Borç Alacak Durumu</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </li>
+
+
+                        }
+
+
+                        <li class="header-menu">
+                            <span>Kullanıcı</span>
+                        </li>
+
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <i class="fa fa-user"></i>
+                                <span>Hesabım</span>
+                                @*<span class="badge badge-pill badge-danger">3</span>*@
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul> 
+                                    <li>
+                                        <a href="/ResidentUser/BillListUnPaid">Ödenecek Faturalarım</a>
+                                    </li>
+                                    <li>
+                                        <a href="/ResidentUser/BillListPaid">Ödenmiş Faturalarım</a>
+                                    </li>
+                                    <li>
+                                        <a href="/Authorize/ResetPasword">Şifre Güncelle</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        @*                        <li class="sidebar-dropdown">
+                            <a href="#">
+                            <i class="fa fa-globe"></i>
+                            <span>Maps</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                            <ul>
+                            <li>
+                            <a href="#">Google maps</a>
+                            </li>
+                            <li>
+                            <a href="#">Open street map</a>
+                            </li>
+                            </ul>
+                            </div>
+                            </li>*@
+
+
+
+
+                        @*    <li class="header-menu">
+                            <span>Extra</span>
+                            </li>
+                            <li>
+                            <a href="#">
+                            <i class="fa fa-book"></i>
+                            <span>Documentation</span>
+                            <span class="badge badge-pill badge-primary">Beta</span>
+                            </a>
+                            </li>
+                            <li>
+                            <a href="#">
+                            <i class="fa fa-calendar"></i>
+                            <span>Calendar</span>
+                            </a>
+                            </li>
+                            <li>
+                            <a href="#">
+                            <i class="fa fa-folder"></i>
+                            <span>Examples</span>
+                            </a>
+                            </li>*@
+                    </ul>
+                </div>
+                <!-- sidebar-menu  -->
+            </div>
+            <!-- sidebar-content  -->
+            <div class="sidebar-footer">
+                @*<a href="#">
+                    <i class="fa fa-bell"></i>
+                    <span class="badge badge-pill badge-warning notification">3</span>
+                </a>*@
+                <a href="/Message/List">
+                    <i class="fa fa-envelope"></i>
+                    <span id="messagelink" class="badge badge-pill badge-success notification"></span>
+                </a>
+                @* <a href="#">
+                    <i class="fa fa-cog"></i>
+                    <span class="badge-sonar"></span>
+                    </a>*@
+                <a href="/Authorize/Logout">
+                    <i class="fa fa-power-off"></i>
+                </a>
+            </div>
+        </nav>
+        <!-- sidebar-wrapper  -->
+        <main class="page-content">
+            <div class="container-fluid">
+                @RenderBody()
+
+
+
+
+                <footer class="text-center">
+                    <div class="mb-2">
+                        <small>
+                            © 2022 made with <i class="fa fa-heart" style="color:red"></i> by - Muhammet Ali
+                            </a>
+                        </small>
+                    </div>
+                    @*        <div>
+                        <a href="https://github.com/azouaoui-med" target="_blank">
+                        <img alt="GitHub followers" src="https://img.shields.io/github/followers/azouaoui-med?label=github&style=social" />
+                        </a>
+                        <a href="https://twitter.com/azouaoui_med" target="_blank">
+                        <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/azouaoui_med?label=twitter&style=social" />
+                        </a>
+                        </div>*@
+                </footer>
+            </div>
+        </main>
+        <!-- page-content" -->
+    </div>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/siteTheme.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+ 
+
+ 
+    <script type="text/javascript">
+        $(document).ready(function () {
+        messageNotification();
+                //5 saniyede bir kontrol et mesaj geliyormu diye 
+        setInterval(messageNotification, 5000);          
+
+
+
+        });
+
+
+        function messageNotification(){
+               $.ajax({
+                    ContentType: 'application/json; charset=utf-8',
+                    type: 'POST',
+                    url: '/Message/GetUnLookedMessageCountForUser',
+                    dataType: 'json',
+                    //data: data,
+                    success: function (result) {
+                        if (result.isSuccess) {                          
+                           console.log(result.data);
+
+                           if(result.data == 0)
+                           {
+                               $("#messagelink").text("");
+                           }else{
+                               $("#messagelink").text(result.data );
+                           }
+
+
+
+                        } else {
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                    }
+                })
+        }
+    </script>
+ 
+ 
+
+
+</body>
+</html>
+
+
+

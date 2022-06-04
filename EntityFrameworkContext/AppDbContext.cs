@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using EFCore.Context.Configurations;
 //using EntityFramework.Context.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -13,7 +14,7 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
         {
 
         }
-        //public DbSet<Car> Cars { get; set; }
+        public DbSet<Course> Courses { get; set; }
         //public DbSet<Block> Blocks { get; set; }
         //public DbSet<Flat> Flats { get; set; }
         //public DbSet<FlatType> FlatTypes { get; set; }
@@ -22,8 +23,8 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            //builder.ApplyConfiguration(new CarConfiguration());
+            builder.HasDefaultSchema("dbo");
+            builder.ApplyConfiguration(new CourseConfiguration());
             //builder.ApplyConfiguration(new BlockConfiguration());
             //builder.ApplyConfiguration(new FlatConfiguration());
             //builder.ApplyConfiguration(new UserTypeConfiguration());

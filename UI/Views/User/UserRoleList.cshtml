@@ -344,7 +344,10 @@
                         $("#UserNameForUpdate").val(result.data.userName);
                         $("#EmailForUpdate").val(result.data.email);
                         $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
-                        $("#RoleSelectedForUpdate").val(result.data.roles[0].id);
+                        if(result.data.roles.length>0){
+                            $("#RoleSelectedForUpdate").val(result.data.roles[0].id);
+                        }
+                   
 
 
 

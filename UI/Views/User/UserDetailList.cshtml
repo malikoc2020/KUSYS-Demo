@@ -1,0 +1,263 @@
+﻿@using Business.DTO
+@{
+    ViewData["Title"] = "Kullanıcı İşlemleri";
+    Layout = "_LayoutTheme";
+}
+@model UserRoleDTO
+<head>
+    <link rel="stylesheet" type="text/css" href="~/lib/DataTable/datatables.min.css" />
+</head>
+
+<div class="row" style="margin-top:50px; margin-bottom:50px;">
+    <div class="col-md-10">
+        <p id="pPageMesaj"></p>
+    </div>
+    <div class="col-md-2">
+    </div>
+</div>
+
+
+
+<table id="UserListTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Adı</th>
+            <th scope="col">Soyadı</th>
+            <th scope="col">EPosta</th>
+            <th scope="col"></th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td class="FirstName">@user.FirstName</td>
+                <td class="LastName">@user.LastName</td>
+                <td class="Email">@user.Email</td>
+                <td>
+                    <button type="button" class="btn btn-primary btnUpdate" data-userid="@user.Id">Detay</button>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+<input type="hidden" id="Role_User_Id" value="@ViewBag.RoleUserId" />
+
+<!-- Modal Update -->
+<div class="modal fade" id="modalUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @* <form id="UserUpdateForm">*@
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Kullanıcı Detay</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+
+                @*asp-controller="User" asp-action="Login" method="post"*@
+                @Html.AntiForgeryToken()
+                @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+
+                @*   <input asp-for="@Model.UserForUpdate.Id" id="IdForUpdate" type="hidden" value="">*@
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Ad</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="FirstNameForUpdate" value="">
+                    </div>
+                </div>
+
+                                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Soyad</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="LastNameForUpdate" value="">
+                    </div>
+                </div>
+
+                                        <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">T.C. No</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="TCForUpdate" value="">
+                    </div>
+                </div>
+
+                        <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Doğum Tarihi</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="date" readonly class="form-control-plaintext" id="BirthDateForUpdate" value="">
+                    </div>
+                </div>
+
+                
+                        <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Kullanici Adı</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="UserNameForUpdate" value="">
+                    </div>
+                </div>
+
+                
+                        <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Telefon No</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="PhoneNumberForUpdate" value="">
+                    </div>
+                </div>
+
+                
+                        <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Tanımlı Roller</label>
+                    <p class="col-sm-1 col-form-label">:</p>
+                    <div class="col-sm-9">
+                        <input type="text" readonly class="form-control-plaintext" id="RoleSelectedForUpdate" value="">
+                    </div>
+                </div>
+                
+                
+                
+                
+ 
+
+                <div style="min-height:40px">
+                    <p id="pUpdateMesajiModal"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Kapat</button>
+            </div>
+            @*        </form>*@
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+<script src="~/lib/DataTable/datatables.min.js"></script>
+
+<script type="text/javascript">
+    var table;
+    var clickedRow;
+    $(document).ready(function () {
+
+        //Data Table initilation
+        table = $('#UserListTable').DataTable({
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tümü"]],
+            //"language": {"url": "/lib/DataTable/Turkish.json"}
+            "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
+        });
+
+
+        $(document).on('click', '.btnUpdate', function () {
+
+            clickedRow = $(this).parent();
+            let userid = $(this).data("userid");
+            //modalEmptyForUpdate();
+            getUserForUpdate(userid);
+        });
+
+    });
+
+    //        function modalEmptyForUpdate() {
+    //    $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+    //}
+
+    function getUserForUpdate(userid) {
+        $.ajax({
+            type: 'POST',
+            url: '/User/Get',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+            data: { UserId: userid },
+            success: function (result) {
+
+
+                if (result.isSuccess) {
+                    $("#IdForUpdate").val(result.data.id);
+                    $("#FirstNameForUpdate").val(result.data.firstName);
+                    $("#LastNameForUpdate").val(result.data.lastName);
+                    $("#TCForUpdate").val(result.data.tc);
+                    //console.log(ConvertDate(result.data.birthDate));
+                     var date = ConvertDate(result.data.birthDate);
+                    document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date);
+
+
+                    $("#UserNameForUpdate").val(result.data.userName);
+                    $("#EmailForUpdate").val(result.data.email);
+                    $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
+                 
+                    if(result.data.roles.length>0){
+                        $("#RoleSelectedForUpdate").val(result.data.roles[0].name);
+                    }
+              
+
+
+
+                    //$('#modalUpdate').modal();
+                    var myModal = new bootstrap.Modal(document.getElementById('modalUpdate'), {keyboard: false});
+                    myModal.show();
+                } else {
+
+                    $("#pUpdateMesajiModal").text(result.errorMessage);
+                    $("#pUpdateMesajiModal").css("color", "red");
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+                $("#pUpdateMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                $("#pUpdateMesajiModal").css("color", "red");
+            }
+        })
+    }
+
+
+
+                function ConvertDate(dateObject) {
+                    var d = new Date(dateObject);
+                    var day = d.getDate();
+                    var month = d.getMonth() + 1;
+                    var year = d.getFullYear();
+                    if (day < 10) {
+                        day = "0" + day;
+                    }
+                    if (month < 10) {
+                        month = "0" + month;
+                    }
+                    //var date = day + "-" + month + "-" + year;
+                    var date = year + "-" + month + "-" + day;
+                    return date;
+                }
+
+                 function ConvertDateDayMounthYear(dateObject) {
+                    var d = new Date(dateObject);
+                    var day = d.getDate();
+                    var month = d.getMonth() + 1;
+                    var year = d.getFullYear();
+                    if (day < 10) {
+                        day = "0" + day;
+                    }
+                    if (month < 10) {
+                        month = "0" + month;
+                    }
+                    var date = day + "." + month + "." + year;
+
+                    return date;
+                }
+
+</script>
+
+}
+
+

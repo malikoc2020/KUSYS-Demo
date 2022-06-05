@@ -306,5 +306,52 @@ namespace UI.Controllers
         }
 
 
+
+
+
+
+
+
+
+
+
+
+        public IActionResult UserDetailList()
+        {
+            var model = new UserRoleDTO();
+            var users = _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Select(x => new UserDTO()
+                {
+                    Id = x.Id,
+                    UserName = x.UserName,
+                    AccessFailedCount = x.AccessFailedCount,
+                    ConcurrencyStamp = x.ConcurrencyStamp,
+                    Email = x.Email,
+                    EmailConfirmed = x.EmailConfirmed,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    LockoutEnabled = x.LockoutEnabled,
+                    PhoneNumberConfirmed = x.PhoneNumberConfirmed,
+                    LockoutEnd = x.LockoutEnd,
+                    NormalizedEmail = x.NormalizedEmail,
+                    NormalizedUserName = x.NormalizedUserName,
+                    PhoneNumber = x.PhoneNumber,
+                    PictureUrl = x.PictureUrl,
+                    TwoFactorEnabled = x.TwoFactorEnabled,
+                    SecurityStamp = x.SecurityStamp,
+                    TC = x.TC,
+                    BirthDate = x.BirthDate,
+                    Roles = x.UserRoles.Select(y => new RoleDTO() { Id = y.RoleId, Name = y.Role.Name }).ToList()
+                }).ToList();
+
+            model.Users = users;
+
+            var allRoles = _roleManager.Roles.Select(x => new RoleDTO() { Id = x.Id, Name = x.Name }).ToList();
+            ViewBag.AllRoles = allRoles;
+            ViewBag.RoleUserId = allRoles.Where(x => x.Name == "User").FirstOrDefault()?.Id;
+            return View(model);
+        }
+
+
     }
 }

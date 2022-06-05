@@ -1,0 +1,304 @@
+﻿@using Business.DTO
+@{
+    ViewData["Title"] = "Kurs İşlemleri";
+    Layout = "_LayoutTheme";
+}
+@model CourseListDTO
+<head>
+    <link rel="stylesheet" type="text/css" href="~/lib/DataTable/datatables.min.css" />
+</head>
+
+<div class="row" style="margin-top:50px; margin-bottom:50px;">
+    <div class="col-md-10">
+        <p id="pPageMesaj"></p>
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-info btnAdd"> + Yeni Kurs</button>
+    </div>
+</div>
+
+
+
+<table id="UserListTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Kodu</th>
+            <th scope="col">Adı</th>
+            <th scope="col"></th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var c in Model.Courses)
+        {
+            <tr>
+                <td class="CourseCode">@c.CourseCode</td>
+                <td class="Name">@c.Name</td>
+                <td>
+                    <button type="button" class="btn btn-primary btnUpdate" data-id="@c.Id">Güncelle</button>
+                    <button type="button" class="btn btn-danger btnDelete" data-id="@c.Id">Sil</button>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="CourseForm">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Yeni kurs</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <input asp-for="@Model.CourseAddorUpdate.Id" id="Id" type="hidden" value="0">
+
+                    <div class="form-group">
+                        <label>Kurs Kodu</label>
+                        <input asp-for="@Model.CourseAddorUpdate.CourseCode" id="CourseCode" type="text" class="form-control" placeholder="Kurs Kodu">
+                        @Html.ValidationMessageFor(model => model.CourseAddorUpdate.CourseCode, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Kurs Adı</label>
+                        <input asp-for="@Model.CourseAddorUpdate.Name" id="Name" type="text" class="form-control" placeholder="Kurs Adı">
+                        @Html.ValidationMessageFor(model => model.CourseAddorUpdate.Name, "", new { @class = "text-danger" })
+                    </div>
+                    
+
+                    <div style="min-height:40px">
+                        <p id="pMesajiModal"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-info" id="btnSubmit">Ekle</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/lib/DataTable/datatables.min.js"></script>
+
+    <script type="text/javascript">
+        var table;
+        var clickedRow;
+        $(document).ready(function () {
+            
+            //Data Table initilation
+            table = $('#UserListTable').DataTable({
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tümü"]],
+                //"language": {"url": "/lib/DataTable/Turkish.json"}
+                "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
+            });
+
+            $(".btnAdd").on("click", function () {
+       
+                modalEmpty(0);
+                //$('#modalAdd').modal();
+                var myModal = new bootstrap.Modal(document.getElementById('modal'), {keyboard: false});
+                myModal.show();
+            });
+
+            $(document).on('click', '.btnUpdate', function () {
+         
+                clickedRow = $(this).parent();
+                let id = $(this).data("id");
+                modalEmpty(id);
+                getCourseForUpdate(id);
+            });
+
+            $(document).on('click', '.btnDelete', function () {
+
+                if (confirm('Kullanıcı Silmek İstediğinizden Emin Misiniz?')) {
+                    clickedRow = $(this).parent();
+                    let id = $(this).data("id");
+                    deleteCourse($(this), id);
+                }
+            });
+
+            $("#btnSubmit").on("click", function (e) {
+                e.preventDefault();
+
+                $('#CourseForm').validate();
+
+                if ($('#CourseForm').valid()) {
+                    addorUpdateCourse();
+                }
+            });
+
+ 
+        });
+        function modalEmpty(id) {
+        
+            $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+
+            $("#CourseCode").val("");
+            $("#Name").val("");
+
+
+             if (id == 0) {
+                $('#btnSubmit').html("Ekle");
+                $('#btnSubmit').removeClass("btn-primary").addClass("btn-info");
+            } else {
+                $('#btnSubmit').html("Güncelle");
+                $('#btnSubmit').removeClass("btn-info").addClass("btn-primary");
+            }
+           
+        }
+
+        function getCourseForUpdate(id) {
+            $.ajax({
+                type: 'POST',
+                url: '/Course/Get',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: { id: id },
+                success: function (result) {
+
+
+                    if (result.isSuccess) {
+                        $("#Id").val(result.data.id);
+                        $("#CourseCode").val(result.data.courseCode);
+                        $("#Name").val(result.data.name);                    
+
+
+                        var myModal = new bootstrap.Modal(document.getElementById('modal'), {keyboard: false});
+                        myModal.show();
+                    } else {
+
+                        $("#pMesajiModal").text(result.errorMessage);
+                        $("#pMesajiModal").css("color", "red");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                    $("#pMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pMesajiModal").css("color", "red");
+                }
+            })
+        }
+
+        var setTimeOutId;
+        function addorUpdateCourse() {
+            $("#pMesajiModal").text("");
+
+              let courseid = $('#Id').val();
+              let url = '/Course/Add';
+            if (courseid > 0) { url = '/Course/Update' }
+
+
+            var data = $("#CourseForm").serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: data,
+                success: function (result) {
+                    if (result.isSuccess) {
+
+                        $("#pMesajiModal").text(result.successMessage);
+                        $("#pMesajiModal").css("color", "green");      
+                        
+                        if(courseid==0)//insert işlemi
+                        {                    
+
+                        table.row.add([
+                            $("#CourseCode").val(),
+                            $("#Name").val(),
+                            "<button type='button' class='btn btn-primary btnUpdate' data-id='" + result.data.id + "'>Güncelle</button>" +
+                            "<button type='button' class='btn btn-danger btnDelete' data-id='" + result.data.id + "'>Sil</button>"
+                        ]).draw();
+                        }
+                        else//update işlemi
+                        {
+                                                    var rData = [
+                            $("#CourseCode").val(),
+                            $("#Name").val(),
+                            "<button type='button' class='btn btn-primary btnUpdate' data-id='" + $("#Id").val() + "'>Güncelle</button>" +
+                            "<button type='button' class='btn btn-danger btnDelete' data-id='" + $("#Id").val() + "'>Sil</button>"
+                        ];
+
+
+                        table.row(clickedRow)
+                            .data(rData)
+                            .draw();
+                        }
+
+
+                            setTimeOutId = setTimeout(function () {
+                            $('#modal').modal('hide');
+                            $("#pMesajiModal").text("");
+                        }, 2500);
+                    } else {
+
+                        $("#pMesajiModal").text(result.errorMessage);
+                        $("#pMesajiModal").css("color", "red");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                    $("#pMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pMesajiModal").css("color", "red");
+                }
+            })
+        }
+
+        //Add model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
+        $('#modal').on('hide.bs.modal', function () {
+            $("#pMesajiModal").text("");
+            clearTimeout(setTimeOutId);
+        });
+             
+
+        function deleteCourse(deleteButton, id) {
+            $("#pPageMesaj").text("");
+
+            $.ajax({
+                type: 'POST',
+                url: '/Course/Delete',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                data: { id: id },
+                success: function (result) {
+                    if (result.isSuccess) {
+                        $("#pPageMesaj").text(result.successMessage);
+                        $("#pPageMesaj").css("color", "green");
+                        //deleteButton.parent().parent().remove();//satırı sil
+                        table.row(clickedRow)
+                            .remove()
+                            .draw();
+                        setTimeout(function () { $("#pPageMesaj").text(""); }, 3000);
+                    } else {
+                        $("#pPageMesaj").text(result.errorMessage);
+                        $("#pPageMesaj").css("color", "red");
+                    }
+                },
+                error: function () {
+                    $("#pPageMesaj").text("Silme işlemi sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                    $("#pPageMesaj").css("color", "red");
+                }
+            })
+        } 
+
+    </script>
+
+}
+
+

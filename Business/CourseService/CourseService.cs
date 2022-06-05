@@ -1,5 +1,4 @@
-﻿
-using Business.DTO;
+﻿using Business.DTO;
 using Domain.Entities;
 using EFCore.Repository.Repository;
 using EFCore.Repository.UnitOfWork;

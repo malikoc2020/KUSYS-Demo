@@ -8,6 +8,10 @@ namespace Business.DTO
 {
     public class UserCourseListDTO
     {
+        public UserCourseListDTO()
+        {
+            Users = new List<UserDTO>();
+        }
         public List<UserDTO> Users { get; set; }
         public UserCourseDTO UserCourseAddorUpdate { get; set; }
     }

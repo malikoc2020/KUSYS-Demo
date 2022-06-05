@@ -1,5 +1,6 @@
-﻿using Business.DTO;
-using Business.UserUserCourseService;
+﻿using Business.CourseService;
+using Business.DTO;
+using Business.UserCourseService;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,16 +17,18 @@ namespace UI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IUserCourseService _userCourseService;
-        public UserCourseController(ILogger<UserCourseController> logger, UserManager<User> userManager, RoleManager<Role> roleManager, IUserCourseService userCourseService)
+        private readonly ICourseService _courseService;
+        public UserCourseController(ILogger<UserCourseController> logger, UserManager<User> userManager, RoleManager<Role> roleManager, IUserCourseService userCourseService, ICourseService courseService)
         {
             _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
-            _userCourseService = userCourseService; 
+            _userCourseService = userCourseService;
+            _courseService = courseService;
         }
 
 
-        public IActionResult UserCarList()
+        public IActionResult UserCourseList()
         {
             var model = new UserCourseListDTO();
             var users = _userManager.Users.Include(u => u.UserCourses).ThenInclude(i=>i.Course)
@@ -42,23 +45,33 @@ namespace UI.Controllers
 
             model.Users = users;
 
+            var allCourses = _courseService.Courses().Select(x => new CourseDTO() { Id = x.Id, Name = x.Name, CourseCode = x.CourseCode}).ToList();
+           // allCourses.Prepend(new CourseDTO() { Id = -1, CourseCode = "", Name = "-Seçiniz-" });
+            ViewBag.AllCourses = allCourses;
+
             return View(model);
         }
 
         [HttpPost]
         public JsonResult AddUserCourse(UserCourseListDTO userList)
         {
+
             UserCourseDTO userCourse = userList.UserCourseAddorUpdate;
             var res = new ReturnObjectDTO();
 
-            if (ModelState.IsValid)
+            var validationMessage = string.Join(" | ", ModelState.Values
+           .SelectMany(v => v.Errors)
+           .Select(e => e.ErrorMessage));
+
+
+            if (ModelState.IsValid || validationMessage== "The Course field is required.")
             {
                 res = _userCourseService.AddUserCourse(userCourse);
             }
             else
             {
                 res.isSuccess = false;
-                res.errorMessage = "";
+                res.errorMessage = "Model is not valid!";
             }
             return new JsonResult(res);
         }
@@ -72,25 +85,29 @@ namespace UI.Controllers
         }
 
         [HttpPost]
-        public JsonResult UpdateCar(UserCourseListDTO userList)
+        public JsonResult UpdateUserCourse(UserCourseListDTO userList)
         {
             UserCourseDTO userCourse = userList.UserCourseAddorUpdate;
             var res = new ReturnObjectDTO();
 
-            if (ModelState.IsValid)
+            var validationMessage = string.Join(" | ", ModelState.Values
+           .SelectMany(v => v.Errors)
+           .Select(e => e.ErrorMessage));
+
+            if (ModelState.IsValid || validationMessage == "The Course field is required.")
             {
                 res = _userCourseService.UpdateUserCourse(userCourse.Id, userCourse);
             }
             else
             {
                 res.isSuccess = false;
-                res.errorMessage = "";
+                res.errorMessage = "Model is not valid!";
             }
             return new JsonResult(res);
         }
 
         [HttpPost]
-        public JsonResult DeleteCar(int id)
+        public JsonResult DeleteUserCourse(int id)
         {
             var res = _userCourseService.DeleteUserCourse(id);
 

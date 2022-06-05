@@ -1,3 +1,5 @@
+using Business.CourseService;
+using Business.UserCourseService;
 using Domain.Entities;
 using EFCore.Context;
 using EFCore.Repository.Repository;
@@ -19,6 +21,8 @@ builder.Services.AddIdentity<User, Role>()
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IUserCourseService, UserCourseService>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

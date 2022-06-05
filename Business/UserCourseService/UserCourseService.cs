@@ -1,11 +1,10 @@
-﻿
-
-using Business.DTO;
+﻿using Business.DTO;
 using Domain.Entities;
 using EFCore.Repository.Repository;
 using EFCore.Repository.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
-namespace Business.UserUserCourseService
+namespace Business.UserCourseService
 {
     public class UserCourseService : IUserCourseService
     {
@@ -45,8 +44,11 @@ namespace Business.UserUserCourseService
                 repository.Add(UserCourseEntity);
                 unitOfWork.Commit();
 
-                UserCourse.Id = UserCourseEntity.Id;
-                return new ReturnObjectDTO() { data = UserCourse, successMessage = "İşlem Başarılı" };
+                //UserCourse.Id = UserCourseEntity.Id;
+
+                var res = UserCourses().Include(x=>x.Course).Where(x=>x.Id == UserCourseEntity.Id).Select(x=>new UserCourseDTO() {Id = x.Id,  CourseId = x.CourseId, UserId = x.UserId, Course = new CourseDTO() {Id = x.Course.Id, CourseCode = x.Course.CourseCode, Name = x.Course.Name } }).FirstOrDefault();
+
+                return new ReturnObjectDTO() { data = res, successMessage = "İşlem Başarılı" };
             }
             catch (Exception)
             {
@@ -72,7 +74,10 @@ namespace Business.UserUserCourseService
             {
                 repository.Update(entity);
                 unitOfWork.Commit();
-                return new ReturnObjectDTO() { data = UserCourse, successMessage = "İşlem Başarılı" };
+
+                var res = UserCourses().Include(x => x.Course).Where(x => x.Id == entity.Id).Select(x => new UserCourseDTO() { Id = x.Id, CourseId = x.CourseId, UserId = x.UserId, Course = new CourseDTO() { Id = x.Course.Id, CourseCode = x.Course.CourseCode, Name = x.Course.Name } }).FirstOrDefault();
+
+                return new ReturnObjectDTO() { data = res, successMessage = "İşlem Başarılı" };
             }
             catch (Exception)
             {

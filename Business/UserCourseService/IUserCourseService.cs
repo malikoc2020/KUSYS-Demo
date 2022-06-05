@@ -1,9 +1,7 @@
-﻿
-
-using Business.DTO;
+﻿using Business.DTO;
 using Domain.Entities;
 
-namespace Business.UserUserCourseService
+namespace Business.UserCourseService
 {
     public interface IUserCourseService
     {

@@ -42,7 +42,7 @@
                 <td class="FirstName">@user.FirstName</td>
                 <td class="LastName">@user.LastName</td>
                 <td class="TC">@user.TC</td>
-                <td class="BirthDate">@user.BirthDate.ToString("dd-MM-yyyy")</td>
+                <td class="BirthDate">@user.BirthDate.ToString("dd.MM.yyyy")</td>
                 <td class="UserName">@user.UserName</td>
                 <td class="Email">@user.Email</td>
                 <td class="PhoneNumber">@user.PhoneNumber</td>
@@ -91,7 +91,7 @@
                     </div>
                        <div class="form-group">
                         <label>Doğum Tarihi</label>
-                        <input asp-for="@Model.UserForAdd.BirthDate" id="BirthDateForAdd" type="text" class="form-control" placeholder="Doğum Tarihi">
+                        <input asp-for="@Model.UserForAdd.BirthDate" id="BirthDateForAdd" type="date" class="form-control" placeholder="Doğum Tarihi">
                         @Html.ValidationMessageFor(model => model.UserForAdd.BirthDate, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group">
@@ -183,7 +183,7 @@
                     </div>
                         <div class="form-group">
                         <label>Doğum Tarihi</label>
-                        <input asp-for="@Model.UserForUpdate.BirthDate" id="BirthDateForUpdate" type="text" class="form-control" placeholder="Doğum Tarihi">
+                        <input asp-for="@Model.UserForUpdate.BirthDate" id="BirthDateForUpdate" type="date" class="form-control" placeholder="Doğum Tarihi">
                         @Html.ValidationMessageFor(model => model.UserForUpdate.BirthDate, "", new { @class = "text-danger" })
                     </div>
 
@@ -322,7 +322,25 @@
                         $("#FirstNameForUpdate").val(result.data.firstName);
                         $("#LastNameForUpdate").val(result.data.lastName);
                         $("#TCForUpdate").val(result.data.tc);
-                        $("#BirthDateForUpdate").val(result.data.birthDate);
+                        console.log(result.data.birthDate);
+                        //console.log(ConvertDate(result.data.birthDate));
+                         var date = ConvertDate(result.data.birthDate);
+                         //var dt = date.split('-');
+                         //var date2 = dt[2] +"-"+ dt[0] +"-"+ dt[2];
+                         //console.log(date2);
+  
+                           // $("input[type=date]").val(date2);
+
+
+                        //$("#BirthDateForUpdate").val(result.data.birthDate);
+
+                        //document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date2);
+                        //console.log(new Date(dt[0],dt[1],dt[2]));
+                        //console.log(date);
+                        //console.log(new Date(date));
+                        document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date);
+
+
                         $("#UserNameForUpdate").val(result.data.userName);
                         $("#EmailForUpdate").val(result.data.email);
                         $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
@@ -369,7 +387,7 @@
                             $("#FirstNameForAdd").val(),
                             $("#LastNameForAdd").val(),
                             $("#TCForAdd").val(), 
-                            $("#BirthDateForAdd").val(),
+                            ConvertDateDayMounthYear($("#BirthDateForAdd").val()),
                             $("#UserNameForAdd").val(),
                             $("#EmailForAdd").val(),
                             $("#PhoneNumberForAdd").val(),
@@ -425,7 +443,7 @@
                             $("#FirstNameForUpdate").val(),
                             $("#LastNameForUpdate").val(),
                             $("#TCForUpdate").val(),
-                            $("#BirthDateForUpdate").val(),
+                            ConvertDateDayMounthYear($("#BirthDateForUpdate").val()),
                             $("#UserNameForUpdate").val(),
                             $("#EmailForUpdate").val(),
                             $("#PhoneNumberForUpdate").val(),
@@ -489,6 +507,39 @@
                 }
             })
         }
+
+
+                    function ConvertDate(dateObject) {
+                        var d = new Date(dateObject);
+                        var day = d.getDate();
+                        var month = d.getMonth() + 1;
+                        var year = d.getFullYear();
+                        if (day < 10) {
+                            day = "0" + day;
+                        }
+                        if (month < 10) {
+                            month = "0" + month;
+                        }
+                        //var date = day + "-" + month + "-" + year;
+                        var date = year + "-" + month + "-" + day;
+                        return date;
+                    }
+
+                     function ConvertDateDayMounthYear(dateObject) {
+                        var d = new Date(dateObject);
+                        var day = d.getDate();
+                        var month = d.getMonth() + 1;
+                        var year = d.getFullYear();
+                        if (day < 10) {
+                            day = "0" + day;
+                        }
+                        if (month < 10) {
+                            month = "0" + month;
+                        }
+                        var date = day + "." + month + "." + year;
+                   
+                        return date;
+                    }
 
     </script>
 

@@ -21,6 +21,7 @@ namespace UI.Controllers
             _roleManager = roleManager;
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult UserRoleList()
         {
             var model = new UserRoleDTO();
@@ -100,6 +101,7 @@ namespace UI.Controllers
             return new JsonResult(res);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<JsonResult> Delete(string UserId)
         {
@@ -127,7 +129,7 @@ namespace UI.Controllers
 
             return new JsonResult(res);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<JsonResult> Add(UserRoleDTO userList)
         {
@@ -230,7 +232,7 @@ namespace UI.Controllers
             }
             return new JsonResult(res);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<JsonResult> Update(UserRoleDTO userList)
         {
@@ -318,8 +320,14 @@ namespace UI.Controllers
 
         public IActionResult UserDetailList()
         {
+            var currentUser = _userManager.GetUserAsync(User).Result;
+            var currentUserRoles = _userManager.GetRolesAsync(currentUser).Result;
+
+
+
             var model = new UserRoleDTO();
             var users = _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Where(x=> currentUserRoles.Contains("Admin") || x.Id==currentUser.Id)
                 .Select(x => new UserDTO()
                 {
                     Id = x.Id,

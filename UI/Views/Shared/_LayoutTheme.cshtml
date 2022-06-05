@@ -73,13 +73,12 @@
                 <!-- sidebar-search  -->
                 <div class="sidebar-menu">
                     <ul>
-                        @if (String.Join(",", currentUserRoles).Contains("Admin"))
-                        {
+                       
 
 
 
                             <li class="header-menu">
-                                <span>Yönetici</span>
+                                <span>Genel</span>
                             </li>
                             <li class="sidebar-dropdown">
                                 <a href="#">
@@ -89,11 +88,14 @@
                                 </a>
                                 <div class="sidebar-submenu">
                                     <ul>
+                                         @if (String.Join(",", currentUserRoles).Contains("Admin"))
+                                        {
                                         <li>
                                             <a href="/User/UserRoleList">
                                                 Kullanıcı/Rol Ekle Güncelle
                                             </a>
                                         </li>
+                                        }
                                         <li>
                                             <a href="/User/UserDetailList">
                                                 Kullanıcı Listesi
@@ -113,10 +115,13 @@
                                 </a>
                                 <div class="sidebar-submenu">
                                     <ul>
+                                    @if (String.Join(",", currentUserRoles).Contains("Admin"))
+                                    {
                                         <li>
                                             <a href="/Course/CourseList">Kurs Ekle Güncelle</a>
                                         </li>
-                                       <li>
+                                    }
+                                    <li>
                                             <a href="/UserCourse/UserCourseList">Kullanıcı Kurs Düzenle</a>
                                         </li>
 
@@ -126,7 +131,7 @@
           
 
 
-                        }
+                   
 
 
                         <li class="header-menu">
@@ -143,7 +148,7 @@
                                 <ul> 
                           
                                     <li>
-                                        <a href="/Authorize/ResetPasword">Şifre Güncelle</a>
+                                        <a href="/Authorize/ResetPassword">Şifre Güncelle</a>
                                     </li>
                                 </ul>
                             </div>

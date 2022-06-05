@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace UI.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class CourseController : Controller
     {
 

@@ -60,9 +60,15 @@ namespace UI.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO model)
         {
+
             if (ModelState.IsValid)
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
+
+                //var sifreKontrol = await _userManager.CheckPasswordAsync(currentUser, model.Password);
+
+                var sifreKontrol = true;//= await _userManager.PasswordValidator.ValidateAsync(model.Password);
+                //var valid = (await UserManager.PasswordValidator.ValidateAsync("pass")).Succeeded;
 
 
                 if (model.Password != model.RePassword)
@@ -70,7 +76,7 @@ namespace UI.Controllers
                     model.IsSuccess = false;
                     model.Message = "İşlem başarısız. Girilen Şifreler Aynı Değil!";
                 }
-                else if (!(await _userManager.CheckPasswordAsync(currentUser, model.Password)))//Şifre uygunluğu kontrol ediliyor. 
+                else if (!sifreKontrol)//Şifre uygunluğu kontrol ediliyor. 
                 {
                     model.IsSuccess = false;
                     model.Message = "Belirlediğiniz şifre geçerli bir şifre değil. Şifreniz En az 1 büyük harf, küçük harf, rakam, özel karakter içeren en az 6 haneden oluşmalıdır.  ";
@@ -103,7 +109,12 @@ namespace UI.Controllers
             }
             else
             {
+                var validationMessage = string.Join(" | ", ModelState.Values
+           .SelectMany(v => v.Errors)
+           .Select(e => e.ErrorMessage));
+
                 model.IsSuccess = false;
+                model.Message = validationMessage;
 
             }
             return View(model);

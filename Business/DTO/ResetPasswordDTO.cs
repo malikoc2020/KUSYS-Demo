@@ -17,6 +17,6 @@ namespace Business.DTO
         [Required(ErrorMessage = "Şifre alanı zorunludur.")]
         public string RePassword { get; set; }
         public bool IsSuccess { get; set; }
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 }

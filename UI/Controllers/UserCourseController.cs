@@ -30,8 +30,12 @@ namespace UI.Controllers
 
         public IActionResult UserCourseList()
         {
+            var currentUser = _userManager.GetUserAsync(User).Result;
+            var currentUserRoles = _userManager.GetRolesAsync(currentUser).Result;
+
             var model = new UserCourseListDTO();
             var users = _userManager.Users.Include(u => u.UserCourses).ThenInclude(i=>i.Course)
+                  .Where(x => currentUserRoles.Contains("Admin") || x.Id == currentUser.Id)
                 .Select(x => new UserDTO()
                 {
                     Id = x.Id,

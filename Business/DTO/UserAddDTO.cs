@@ -9,7 +9,7 @@ namespace Business.DTO
 {
     public class UserAddDTO
     {
-        public string Id { get; set; }
+        public string? Id { get; set; }
         [Required(ErrorMessage = "Ad girilmesi zorunlu!1")]
         public string FirstName { get; set; }
         [Required(ErrorMessage = "Soyad girilmesi zorunlu!1")]

@@ -19,8 +19,9 @@ namespace Business.DTO
         [Required(ErrorMessage = "Email girilmesi zorunlu!")]
         [EmailAddress(ErrorMessage = "Email hatalı!")]
         public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
         public string RoleSelected { get; set; }
+        [Required(ErrorMessage = "T.C. Kimlik No girilmesi zorunlu!")]
         public string TC { get; set; }
         [Required(ErrorMessage = "Doğum tarihi girilmesi zorunlu!")]
         public DateTime BirthDate { get; set; }

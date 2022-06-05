@@ -72,7 +72,7 @@
                 </div>
                 <div class="modal-body">
 
-                    @Html.HiddenFor(model=>model.UserForAdd.Id,new { @value = 0 })
+                    <input asp-for="@Model.UserForAdd.Id" id="IdForAdd" type="hidden" value="0">
 
                     <div class="form-group">
                         <label>Ad</label>

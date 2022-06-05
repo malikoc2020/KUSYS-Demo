@@ -131,19 +131,20 @@ namespace UI.Controllers
         [HttpPost]
         public async Task<JsonResult> Add(UserRoleDTO userList)
         {
-            var message = string.Join(" | ", ModelState.Values
-.SelectMany(v => v.Errors)
-.Select(e => e.ErrorMessage));
+            var validationMessage = string.Join(" | ", ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage));
             UserAddDTO user = userList.UserForAdd;
             var res = new ReturnObjectDTO();
 
-            if (ModelState.IsValid)
+            //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
+            if (ModelState.IsValid|| validationMessage == "The UserForUpdate field is required.")
             {
 
 
                 try
                 {
-                    if (string.IsNullOrEmpty(user.Id))//Yeni kullanıcı ekleme işlemi
+                    if (string.IsNullOrEmpty(user.Id) || user.Id=="0")//Yeni kullanıcı ekleme işlemi
                     {
                         var userEntity = new User()
                         {
@@ -225,7 +226,7 @@ namespace UI.Controllers
             else
             {
                 res.isSuccess = false;
-                res.errorMessage = "";
+                res.errorMessage = validationMessage;
             }
             return new JsonResult(res);
         }
@@ -233,14 +234,15 @@ namespace UI.Controllers
         [HttpPost]
         public async Task<JsonResult> Update(UserRoleDTO userList)
         {
-            var message = string.Join(" | ", ModelState.Values
-       .SelectMany(v => v.Errors)
-       .Select(e => e.ErrorMessage));
+            var validationMessage = string.Join(" | ", ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage));
 
 
             UserUpdateDTO user = userList.UserForUpdate;
             var res = new ReturnObjectDTO();
-            if (ModelState.IsValid)
+            //burada da insert objesinin validation mesajını dikkate alma. çünkü burada update işlemi yapılıyor. 
+            if (ModelState.IsValid || validationMessage == "The UserForAdd field is required.")
             {
                 try
                 {
@@ -298,7 +300,7 @@ namespace UI.Controllers
             else
             {
                 res.isSuccess = false;
-                res.errorMessage = "";
+                res.errorMessage = validationMessage;
             }
             return new JsonResult(res);
         }

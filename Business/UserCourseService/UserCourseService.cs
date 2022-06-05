@@ -29,7 +29,7 @@ namespace Business.UserCourseService
             var UserCourses = repository.GetAll().ToList();
             return new ReturnObjectDTO() { data = UserCourses };
         }
-        public ReturnObjectDTO AddUserCourse(UserCourseDTO UserCourse)
+        public ReturnObjectDTO AddUserCourse(UserCourseDTO UserCourse, string insertedBy = "")
         {
             try
             {
@@ -38,7 +38,8 @@ namespace Business.UserCourseService
                     UserId = UserCourse.UserId,
                     CourseId = UserCourse.CourseId,
                     DateCreated = DateTime.Now,
-                    IsActive = true
+                    IsActive = true,
+                    CreatedUserId = insertedBy
                 };
 
                 repository.Add(UserCourseEntity);
@@ -70,6 +71,7 @@ namespace Business.UserCourseService
 
             entity.UserId = UserCourse.UserId;
             entity.CourseId = UserCourse.CourseId;
+            entity.UpdatedUserId = updatedBy;
             try
             {
                 repository.Update(entity);

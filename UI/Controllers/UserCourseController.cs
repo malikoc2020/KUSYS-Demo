@@ -70,7 +70,8 @@ namespace UI.Controllers
 
             if (ModelState.IsValid || validationMessage== "The Course field is required.")
             {
-                res = _userCourseService.AddUserCourse(userCourse);
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                res = _userCourseService.AddUserCourse(userCourse,currentUser.Id);
             }
             else
             {
@@ -100,7 +101,8 @@ namespace UI.Controllers
 
             if (ModelState.IsValid || validationMessage == "The Course field is required.")
             {
-                res = _userCourseService.UpdateUserCourse(userCourse.Id, userCourse);
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                res = _userCourseService.UpdateUserCourse(userCourse.Id, userCourse,currentUser.Id);
             }
             else
             {
@@ -113,7 +115,8 @@ namespace UI.Controllers
         [HttpPost]
         public JsonResult DeleteUserCourse(int id)
         {
-            var res = _userCourseService.DeleteUserCourse(id);
+            var currentUser = _userManager.GetUserAsync(User).Result;
+            var res = _userCourseService.DeleteUserCourse(id,currentUser.Id);
 
             return new JsonResult(res);
         }

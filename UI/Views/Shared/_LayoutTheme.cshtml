@@ -17,7 +17,13 @@
 <body>
     @{
         var currentUser = _userManager.GetUserAsync(User).Result;
-        var currentUserRoles = _userManager.GetRolesAsync(currentUser).Result;
+        var currentUserRoles = new List<string>();
+        if(currentUser!=null)
+        {
+            var r = _userManager.GetRolesAsync(currentUser).Result;
+            currentUserRoles = (List<string>)r;
+        }
+       
 
     }
 
@@ -35,7 +41,7 @@
                 </div>
                 <div class="sidebar-header">
                     <div class="user-pic">
-                        @if (String.IsNullOrEmpty(@currentUser.PictureUrl))
+                        @if (String.IsNullOrEmpty(@currentUser?.PictureUrl))
                         {
                             <img class="img-responsive img-rounded" src="~/images/EmptyUser.png" alt="User picture">
                         }

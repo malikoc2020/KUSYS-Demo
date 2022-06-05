@@ -28,7 +28,7 @@ namespace Business.CourseService
             var Courses = repository.GetAll().ToList();
             return new ReturnObjectDTO() { data = Courses };
         }
-        public ReturnObjectDTO AddCourse(CourseDTO Course)
+        public ReturnObjectDTO AddCourse(CourseDTO Course, string insertBy = "")
         {
             try
             {
@@ -37,7 +37,8 @@ namespace Business.CourseService
                     CourseCode = Course.CourseCode,
                     Name = Course.Name,
                     DateCreated = DateTime.Now,
-                    IsActive = true
+                    IsActive = true,
+                    CreatedUserId = insertBy
                 };
 
                 repository.Add(CourseEntity);
@@ -58,7 +59,7 @@ namespace Business.CourseService
                 return new ReturnObjectDTO() { isSuccess = false, errorMessage = "İşlem BAŞARISIZ. Güncellenecek Kayıt Bilgisi Bulunamadı." };
             }
 
-            var entity = repository.GetById(id);// GetCourse(id);
+            var entity = repository.GetById(id);
             if (entity == null)
             {
                 return new ReturnObjectDTO() { isSuccess = false, errorMessage = "İşlem BAŞARISIZ. Güncellenecek Kayıt Bilgisi Bulunamadı.(2)" };
@@ -66,6 +67,7 @@ namespace Business.CourseService
 
             entity.CourseCode = Course.CourseCode;
             entity.Name = Course.Name;
+            entity.UpdatedUserId = updatedBy;
             try
             {
                 repository.Update(entity);
@@ -79,7 +81,7 @@ namespace Business.CourseService
         }
         public ReturnObjectDTO DeleteCourse(int id, string updatedBy = "")
         {
-            var entity = repository.GetById(id);//GetCourse(id);
+            var entity = repository.GetById(id);
             if (entity == null)
             {
                 return new ReturnObjectDTO() { isSuccess = false, errorMessage = "İşlem BAŞARISIZ. Silinecek Kayıt Bilgisi Bulunamadı.(2)" };

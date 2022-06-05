@@ -166,7 +166,7 @@ namespace UI.Controllers
                             LockoutEnabled = false,
                             AccessFailedCount = 0,
                             TC = user.TC,
-                            BirthDate = user.BirthDate
+                            BirthDate = user.BirthDate                           
                         };
 
 

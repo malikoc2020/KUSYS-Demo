@@ -56,7 +56,8 @@ namespace UI.Controllers
         [HttpPost]
         public JsonResult Delete(int id)
         {
-            var res = _courseService.DeleteCourse(id);           
+            var currentUser = _userManager.GetUserAsync(User).Result;
+            var res = _courseService.DeleteCourse(id, currentUser.Id);           
 
             return new JsonResult(res);
         }
@@ -72,8 +73,10 @@ namespace UI.Controllers
 
             //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
             if (ModelState.IsValid|| validationMessage == "The UserForUpdate field is required.")
-            { 
-                res = _courseService.AddCourse(course);                           }
+            {
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                res = _courseService.AddCourse(course,currentUser.Id);                           
+            }
             else
             {
                 res.isSuccess = false;
@@ -94,7 +97,8 @@ namespace UI.Controllers
             //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
             if (ModelState.IsValid || validationMessage == "The UserForUpdate field is required.")
             {
-                res = _courseService.UpdateCourse(course.Id, course);
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                res = _courseService.UpdateCourse(course.Id, course,currentUser.Id);
             }
             else
             {

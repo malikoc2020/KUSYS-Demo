@@ -8,7 +8,7 @@ namespace Business.CourseService
         IQueryable<Course> Courses();
         ReturnObjectDTO GetCourse(int id);
         ReturnObjectDTO GetAllCourses();
-        ReturnObjectDTO AddCourse(CourseDTO Course);
+        ReturnObjectDTO AddCourse(CourseDTO Course, string insertBy = "");
         ReturnObjectDTO UpdateCourse(int id, CourseDTO Course, string updatedBy = "");
         ReturnObjectDTO DeleteCourse(int id, string updatedBy = "");
     }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace UI.Controllers
 {
+    //Kullanıcıya kurs tanımlama, tanımlı kursları güncelleme,  silme ve listeleme işlemleri burada yapılmaktadır. 
     [Authorize]
     public class UserCourseController : Controller
     {
@@ -34,7 +35,7 @@ namespace UI.Controllers
             var currentUserRoles = _userManager.GetRolesAsync(currentUser).Result;
 
             var model = new UserCourseListDTO();
-            var users = _userManager.Users.Include(u => u.UserCourses).ThenInclude(i=>i.Course)
+            var users = _userManager.Users.Include(u => u.UserCourses).ThenInclude(i => i.Course)
                   .Where(x => currentUserRoles.Contains("Admin") || x.Id == currentUser.Id)
                 .Select(x => new UserDTO()
                 {
@@ -43,14 +44,14 @@ namespace UI.Controllers
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhoneNumber = x.PhoneNumber,
-                    UserCourses = x.UserCourses.Select(y => new UserCourseDTO() { Id = y.Id, CourseId = y.CourseId, UserId = x.Id, Course = new CourseDTO() {Id = y.Course.Id, CourseCode  = y.Course.CourseCode, Name = y.Course.Name } }).ToList()
+                    UserCourses = x.UserCourses.Select(y => new UserCourseDTO() { Id = y.Id, CourseId = y.CourseId, UserId = x.Id, Course = new CourseDTO() { Id = y.Course.Id, CourseCode = y.Course.CourseCode, Name = y.Course.Name } }).ToList()
 
                 }).ToList();
 
             model.Users = users;
 
-            var allCourses = _courseService.Courses().Select(x => new CourseDTO() { Id = x.Id, Name = x.Name, CourseCode = x.CourseCode}).ToList();
-           // allCourses.Prepend(new CourseDTO() { Id = -1, CourseCode = "", Name = "-Seçiniz-" });
+            var allCourses = _courseService.Courses().Select(x => new CourseDTO() { Id = x.Id, Name = x.Name, CourseCode = x.CourseCode }).ToList();
+            // allCourses.Prepend(new CourseDTO() { Id = -1, CourseCode = "", Name = "-Seçiniz-" });
             ViewBag.AllCourses = allCourses;
 
             return View(model);
@@ -68,10 +69,10 @@ namespace UI.Controllers
            .Select(e => e.ErrorMessage));
 
 
-            if (ModelState.IsValid || validationMessage== "The Course field is required.")
+            if (ModelState.IsValid || validationMessage == "The Course field is required.")
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
-                res = _userCourseService.AddUserCourse(userCourse,currentUser.Id);
+                res = _userCourseService.AddUserCourse(userCourse, currentUser.Id);
             }
             else
             {
@@ -102,7 +103,7 @@ namespace UI.Controllers
             if (ModelState.IsValid || validationMessage == "The Course field is required.")
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
-                res = _userCourseService.UpdateUserCourse(userCourse.Id, userCourse,currentUser.Id);
+                res = _userCourseService.UpdateUserCourse(userCourse.Id, userCourse, currentUser.Id);
             }
             else
             {
@@ -116,7 +117,7 @@ namespace UI.Controllers
         public JsonResult DeleteUserCourse(int id)
         {
             var currentUser = _userManager.GetUserAsync(User).Result;
-            var res = _userCourseService.DeleteUserCourse(id,currentUser.Id);
+            var res = _userCourseService.DeleteUserCourse(id, currentUser.Id);
 
             return new JsonResult(res);
         }

@@ -240,14 +240,7 @@
                             </a>
                         </small>
                     </div>
-                    @*        <div>
-                        <a href="https://github.com/azouaoui-med" target="_blank">
-                        <img alt="GitHub followers" src="https://img.shields.io/github/followers/azouaoui-med?label=github&style=social" />
-                        </a>
-                        <a href="https://twitter.com/azouaoui_med" target="_blank">
-                        <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/azouaoui_med?label=twitter&style=social" />
-                        </a>
-                        </div>*@
+                  
                 </footer>
             </div>
         </main>
@@ -257,54 +250,11 @@
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-@*    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>*@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     <script src="~/js/siteTheme.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
- 
-
- 
-@*    <script type="text/javascript">
-        $(document).ready(function () {
-        messageNotification();
-        setInterval(messageNotification, 5000);          
-
-
-
-        });
-
-
-        function messageNotification(){
-               $.ajax({
-                    ContentType: 'application/json; charset=utf-8',
-                    type: 'POST',
-                    url: '/Message/GetUnLookedMessageCountForUser',
-                    dataType: 'json',
-                    success: function (result) {
-                        if (result.isSuccess) {                          
-                           console.log(result.data);
-
-                           if(result.data == 0)
-                           {
-                               $("#messagelink").text("");
-                           }else{
-                               $("#messagelink").text(result.data );
-                           }
-
-
-
-                        } else {
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                    }
-                })
-        }
-    </script>*@
- 
  
 
 

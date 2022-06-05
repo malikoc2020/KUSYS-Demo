@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace UI.Controllers
 {
+    //Kullanıcı listeleme, ekleme,güncelleme, silme işlemleri burada yapılmaktadır. 
     [Authorize]
     public class UserController : Controller
     {
@@ -140,13 +141,13 @@ namespace UI.Controllers
             var res = new ReturnObjectDTO();
 
             //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
-            if (ModelState.IsValid|| validationMessage == "The UserForUpdate field is required.")
+            if (ModelState.IsValid || validationMessage == "The UserForUpdate field is required.")
             {
 
 
                 try
                 {
-                    if (string.IsNullOrEmpty(user.Id) || user.Id=="0")//Yeni kullanıcı ekleme işlemi
+                    if (string.IsNullOrEmpty(user.Id) || user.Id == "0")//Yeni kullanıcı ekleme işlemi
                     {
                         var userEntity = new User()
                         {
@@ -166,7 +167,7 @@ namespace UI.Controllers
                             LockoutEnabled = false,
                             AccessFailedCount = 0,
                             TC = user.TC,
-                            BirthDate = user.BirthDate                           
+                            BirthDate = user.BirthDate
                         };
 
 
@@ -327,7 +328,7 @@ namespace UI.Controllers
 
             var model = new UserRoleDTO();
             var users = _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .Where(x=> currentUserRoles.Contains("Admin") || x.Id==currentUser.Id)
+                .Where(x => currentUserRoles.Contains("Admin") || x.Id == currentUser.Id)
                 .Select(x => new UserDTO()
                 {
                     Id = x.Id,

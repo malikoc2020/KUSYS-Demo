@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Business.UserCourseService
 {
+    //Kullanıcıların Kurs işlemleri için kullanılacak servis kodları.
     public class UserCourseService : IUserCourseService
     {
         private readonly IRepository<UserCourse> repository;

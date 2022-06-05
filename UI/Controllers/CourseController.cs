@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace UI.Controllers
 {
+    //Kurs tanımla, güncelleme, silme işlemleri burada gerçekleştiriliyor.
     [Authorize(Roles = "Admin")]
     public class CourseController : Controller
     {
@@ -29,7 +30,7 @@ namespace UI.Controllers
             var model = new CourseListDTO();
             var courses = _courseService.Courses().Select(c => new CourseDTO() { CourseCode = c.CourseCode, Id = c.Id, Name = c.Name }).ToList();
             model.Courses = courses;
- 
+
             return View(model);
         }
 
@@ -38,7 +39,7 @@ namespace UI.Controllers
         {
             var res = new ReturnObjectDTO();
 
-            var model = _courseService.Courses().Where(x=>x.Id == id).Select(c => new CourseDTO() { CourseCode = c.CourseCode, Id = c.Id, Name = c.Name }).FirstOrDefault();
+            var model = _courseService.Courses().Where(x => x.Id == id).Select(c => new CourseDTO() { CourseCode = c.CourseCode, Id = c.Id, Name = c.Name }).FirstOrDefault();
 
             if (model == null)
             {
@@ -57,7 +58,7 @@ namespace UI.Controllers
         public JsonResult Delete(int id)
         {
             var currentUser = _userManager.GetUserAsync(User).Result;
-            var res = _courseService.DeleteCourse(id, currentUser.Id);           
+            var res = _courseService.DeleteCourse(id, currentUser.Id);
 
             return new JsonResult(res);
         }
@@ -71,11 +72,10 @@ namespace UI.Controllers
             CourseDTO course = courseList.CourseAddorUpdate;
             var res = new ReturnObjectDTO();
 
-            //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
-            if (ModelState.IsValid|| validationMessage == "The UserForUpdate field is required.")
+            if (ModelState.IsValid)
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
-                res = _courseService.AddCourse(course,currentUser.Id);                           
+                res = _courseService.AddCourse(course, currentUser.Id);
             }
             else
             {
@@ -94,11 +94,10 @@ namespace UI.Controllers
             CourseDTO course = courseList.CourseAddorUpdate;
             var res = new ReturnObjectDTO();
 
-            //update objesinin olmamasını dikkate alma! Burada insert işlemi yapılıyor. 
-            if (ModelState.IsValid || validationMessage == "The UserForUpdate field is required.")
+            if (ModelState.IsValid)
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
-                res = _courseService.UpdateCourse(course.Id, course,currentUser.Id);
+                res = _courseService.UpdateCourse(course.Id, course, currentUser.Id);
             }
             else
             {

@@ -89,7 +89,7 @@
                         <input asp-for="@Model.UserForAdd.TC" id="TCForAdd" type="text" class="form-control" placeholder="T.C. Kimlik No">
                         @Html.ValidationMessageFor(model => model.UserForAdd.TC, "", new { @class = "text-danger" })
                     </div>
-                       <div class="form-group">
+                    <div class="form-group">
                         <label>Doğum Tarihi</label>
                         <input asp-for="@Model.UserForAdd.BirthDate" id="BirthDateForAdd" type="date" class="form-control" placeholder="Doğum Tarihi">
                         @Html.ValidationMessageFor(model => model.UserForAdd.BirthDate, "", new { @class = "text-danger" })
@@ -159,10 +159,7 @@
                 </div>
                 <div class="modal-body">
 
-
-                    @*asp-controller="User" asp-action="Login" method="post"*@
                     @Html.AntiForgeryToken()
-                    @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
 
                     <input asp-for="@Model.UserForUpdate.Id" id="IdForUpdate" type="hidden" value="">
 
@@ -181,7 +178,7 @@
                         <input asp-for="@Model.UserForUpdate.TC" id="TCForUpdate" type="text" class="form-control" placeholder="T.C. Kimlik No">
                         @Html.ValidationMessageFor(model => model.UserForUpdate.TC, "", new { @class = "text-danger" })
                     </div>
-                        <div class="form-group">
+                    <div class="form-group">
                         <label>Doğum Tarihi</label>
                         <input asp-for="@Model.UserForUpdate.BirthDate" id="BirthDateForUpdate" type="date" class="form-control" placeholder="Doğum Tarihi">
                         @Html.ValidationMessageFor(model => model.UserForUpdate.BirthDate, "", new { @class = "text-danger" })
@@ -230,321 +227,300 @@
 
 
 @section Scripts {
-    <script src="~/lib/DataTable/datatables.min.js"></script>
+<script src="~/lib/DataTable/datatables.min.js"></script>
 
-    <script type="text/javascript">
-        var table;
-        var clickedRow;
-        $(document).ready(function () {
-            
-            //Data Table initilation
-            table = $('#UserListTable').DataTable({
-                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tümü"]],
-                //"language": {"url": "/lib/DataTable/Turkish.json"}
-                "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
-            });
+<script type="text/javascript">
+    var table;
+    var clickedRow;
+    $(document).ready(function () {
 
-            $(".btnAdd").on("click", function () {
-       
-                modalEmptyForAdd();
-                //$('#modalAdd').modal();
-                var myModal = new bootstrap.Modal(document.getElementById('modalAdd'), {keyboard: false});
-                myModal.show();
-            });
+        //Data Table initilation
+        table = $('#UserListTable').DataTable({
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tümü"]],
+            //"language": {"url": "/lib/DataTable/Turkish.json"}
+            "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
+        });
 
-            $(document).on('click', '.btnUpdate', function () {
-         
+        //Yeni Kayıt.
+        $(".btnAdd").on("click", function () {
+            modalEmptyForAdd();
+            var myModal = new bootstrap.Modal(document.getElementById('modalAdd'), {keyboard: false});
+            myModal.show();
+        });
+
+        //Kayıt Güncelle
+        $(document).on('click', '.btnUpdate', function () {
+
+            clickedRow = $(this).parent();
+            let userid = $(this).data("userid");
+            modalEmptyForUpdate();
+            getUserForUpdate(userid);
+        });
+
+        //Kayıt Sil.
+        $(document).on('click', '.btnDelete', function () {
+
+            if (confirm('Kullanıcı Silmek İstediğinizden Emin Misiniz?')) {
                 clickedRow = $(this).parent();
                 let userid = $(this).data("userid");
-                modalEmptyForUpdate();
-                getUserForUpdate(userid);
-            });
-
-            $(document).on('click', '.btnDelete', function () {
-
-                if (confirm('Kullanıcı Silmek İstediğinizden Emin Misiniz?')) {
-                    clickedRow = $(this).parent();
-                    let userid = $(this).data("userid");
-                    deleteUser($(this), userid);
-                }
-            });
-
-            $("#btnAddSubmit").on("click", function (e) {
-                e.preventDefault();
-
-                $('#UserAddForm').validate();
-
-                if ($('#UserAddForm').valid()) {
-                    addUser();
-                }
-            });
-
-            $("#btnUpdateSubmit").on("click", function (e) {
-
-                e.preventDefault();
-
-                $('#UserUpdateForm').validate();
-
-                if ($('#UserUpdateForm').valid()) {
-                    updateUser();
-                }
-            });
+                deleteUser($(this), userid);
+            }
         });
-        function modalEmptyForAdd() {
-           //console.log("+");
-            $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
 
-            $("#FirstNameForAdd").val("");
-            $("#LastNameForAdd").val("");
-            $("#TCForAdd").val("");
-            $("#BirthDateForAdd").val("");
-            $("#UserNameForAdd").val("");
-            $("#EmailForAdd").val("");
-            $("#PhoneNumberForAdd").val("");
-            $("#RoleSelectedForAdd").val($("#Role_User_Id").val());
-            $("#PasswordForAdd").val("Sirfe%5");
-             // console.log("++");
-        }
-        function modalEmptyForUpdate() {
-            $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
-        }
-        function getUserForUpdate(userid) {
-            $.ajax({
-                type: 'POST',
-                url: '/User/Get',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
-                data: { UserId: userid },
-                success: function (result) {
+        $("#btnAddSubmit").on("click", function (e) {
+            e.preventDefault();
 
+            $('#UserAddForm').validate();
 
-                    if (result.isSuccess) {
-                        $("#IdForUpdate").val(result.data.id);
-                        $("#FirstNameForUpdate").val(result.data.firstName);
-                        $("#LastNameForUpdate").val(result.data.lastName);
-                        $("#TCForUpdate").val(result.data.tc);
-                        console.log(result.data.birthDate);
-                        //console.log(ConvertDate(result.data.birthDate));
-                         var date = ConvertDate(result.data.birthDate);
-                         //var dt = date.split('-');
-                         //var date2 = dt[2] +"-"+ dt[0] +"-"+ dt[2];
-                         //console.log(date2);
-  
-                           // $("input[type=date]").val(date2);
+            if ($('#UserAddForm').valid()) //validasyondan geçerse yeni kayıt ekleme işlemine devam et.
+            {
+                addUser();
+            }
+        });
 
+        $("#btnUpdateSubmit").on("click", function (e) {
 
-                        //$("#BirthDateForUpdate").val(result.data.birthDate);
+            e.preventDefault();
 
-                        //document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date2);
-                        //console.log(new Date(dt[0],dt[1],dt[2]));
-                        //console.log(date);
-                        //console.log(new Date(date));
-                        document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date);
+            $('#UserUpdateForm').validate();
 
+            if ($('#UserUpdateForm').valid()) //validasyondan geçerse kayıt güncelleme işlemine devam et.
+            {
+                updateUser();
+            }
+        });
+    });
+    function modalEmptyForAdd() {
+        $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+        //yeni kayıt için popup ekranını temizle.
+        $("#FirstNameForAdd").val("");
+        $("#LastNameForAdd").val("");
+        $("#TCForAdd").val("");
+        $("#BirthDateForAdd").val("");
+        $("#UserNameForAdd").val("");
+        $("#EmailForAdd").val("");
+        $("#PhoneNumberForAdd").val("");
+        $("#RoleSelectedForAdd").val($("#Role_User_Id").val());
+        $("#PasswordForAdd").val("Sirfe%5");
+    }
+    function modalEmptyForUpdate() {
+        $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
+    }
 
-                        $("#UserNameForUpdate").val(result.data.userName);
-                        $("#EmailForUpdate").val(result.data.email);
-                        $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
-                        if(result.data.roles.length>0){
-                            $("#RoleSelectedForUpdate").val(result.data.roles[0].id);
-                        }
-                   
+    //güncellenmek istenen kullanıcının anlık olarak bilgilerini veritabanından getir ve popup ekranına yerleştir. 
+    function getUserForUpdate(userid) {
+        $.ajax({
+            type: 'POST',
+            url: '/User/Get',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8', 
+            data: { UserId: userid },
+            success: function (result) {
 
 
+                if (result.isSuccess) {
+                    $("#IdForUpdate").val(result.data.id);
+                    $("#FirstNameForUpdate").val(result.data.firstName);
+                    $("#LastNameForUpdate").val(result.data.lastName);
+                    $("#TCForUpdate").val(result.data.tc);
+                     var date = ConvertDate(result.data.birthDate);
+                    document.getElementById("BirthDateForUpdate").valueAsDate = new Date(date);
 
-                        //$('#modalUpdate').modal();
-                        var myModal = new bootstrap.Modal(document.getElementById('modalUpdate'), {keyboard: false});
-                        myModal.show();
-                    } else {
 
-                        $("#pUpdateMesajiModal").text(result.errorMessage);
-                        $("#pUpdateMesajiModal").css("color", "red");
+                    $("#UserNameForUpdate").val(result.data.userName);
+                    $("#EmailForUpdate").val(result.data.email);
+                    $("#PhoneNumberForUpdate").val(result.data.phoneNumber);
+                    if(result.data.roles.length>0){
+                        $("#RoleSelectedForUpdate").val(result.data.roles[0].id);
                     }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                    $("#pUpdateMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    //pupop ı aç.
+                    var myModal = new bootstrap.Modal(document.getElementById('modalUpdate'), {keyboard: false});
+                    myModal.show();
+                } else {
+
+                    $("#pUpdateMesajiModal").text(result.errorMessage);
                     $("#pUpdateMesajiModal").css("color", "red");
                 }
-            })
-        }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+                $("#pUpdateMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                $("#pUpdateMesajiModal").css("color", "red");
+            }
+        })
+    }
 
-        var addSetTimeOutId;
-        function addUser() {
-            $("#pAddMesajiModal").text("");
-            var data = $("#UserAddForm").serialize();
+    var addSetTimeOutId;
+    function addUser() {
+        $("#pAddMesajiModal").text("");
+        var data = $("#UserAddForm").serialize();
 
-            $.ajax({
-                type: 'POST',
-                url: '/User/Add',
-                dataType: 'json',
-                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
-                data: data,
-                success: function (result) {
-                    if (result.isSuccess) {
+        $.ajax({
+            type: 'POST',
+            url: '/User/Add',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                if (result.isSuccess) {
 
-                        $("#pAddMesajiModal").text(result.successMessage);
-                        $("#pAddMesajiModal").css("color", "green");                     
+                    $("#pAddMesajiModal").text(result.successMessage);
+                    $("#pAddMesajiModal").css("color", "green");
 
-                        table.row.add([
-                            $("#FirstNameForAdd").val(),
-                            $("#LastNameForAdd").val(),
-                            $("#TCForAdd").val(), 
-                            ConvertDateDayMounthYear($("#BirthDateForAdd").val()),
-                            $("#UserNameForAdd").val(),
-                            $("#EmailForAdd").val(),
-                            $("#PhoneNumberForAdd").val(),
-                            $("#RoleSelectedForAdd option:selected").text(),
-                            "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + result.data + "'>Güncelle</button>" +
-                            "<button type='button' class='btn btn-danger btnDelete' data-userid='" + result.data + "'>Sil</button>"
-                        ]).draw();
-
+                    table.row.add([
+                        $("#FirstNameForAdd").val(),
+                        $("#LastNameForAdd").val(),
+                        $("#TCForAdd").val(),
+                        ConvertDateDayMounthYear($("#BirthDateForAdd").val()),
+                        $("#UserNameForAdd").val(),
+                        $("#EmailForAdd").val(),
+                        $("#PhoneNumberForAdd").val(),
+                        $("#RoleSelectedForAdd option:selected").text(),
+                        "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + result.data + "'>Güncelle</button>" +
+                        "<button type='button' class='btn btn-danger btnDelete' data-userid='" + result.data + "'>Sil</button>"
+                    ]).draw();
 
 
-                        addSetTimeOutId = setTimeout(function () {
-                            $('#modalAdd').modal('hide');
-                            $("#pAddMesajiModal").text("");
-                        }, 2500);
-                    } else {
 
-                        $("#pAddMesajiModal").text(result.errorMessage);
-                        $("#pAddMesajiModal").css("color", "red");
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                    $("#pAddMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                    addSetTimeOutId = setTimeout(function () {
+                        $('#modalAdd').modal('hide');
+                        $("#pAddMesajiModal").text("");
+                    }, 2500);
+                } else {
+
+                    $("#pAddMesajiModal").text(result.errorMessage);
                     $("#pAddMesajiModal").css("color", "red");
                 }
-            })
-        }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+                $("#pAddMesajiModal").text("Hata! Tekrar deneyiniz. Hata almaya devam ediyorsanız; Lütfen yöneticinizle iletişime geçiniz!");
+                $("#pAddMesajiModal").css("color", "red");
+            }
+        })
+    }
 
-        //Add model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
-        $('#modalAdd').on('hide.bs.modal', function () {
-            $("#pAddMesajiModal").text("");
-            clearTimeout(addSetTimeOutId);
-        });
+    //Add model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
+    $('#modalAdd').on('hide.bs.modal', function () {
+        $("#pAddMesajiModal").text("");
+        clearTimeout(addSetTimeOutId);
+    });
 
-        var updateSetTimeOutId;
-        function updateUser() {
-            $("#pUpdateMesajiModal").text("");
-            var data = $("#UserUpdateForm").serialize();
-            $.ajax({
-                type: 'POST',
-                url: '/User/Update',
-                dataType: 'json',
-                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
-                data: data,
-                success: function (result) {
-                    if (result.isSuccess) {
-                        $("#pUpdateMesajiModal").text(result.successMessage);
-                        $("#pUpdateMesajiModal").css("color", "green");
+    var updateSetTimeOutId;
+    function updateUser() {
+        $("#pUpdateMesajiModal").text("");
+        var data = $("#UserUpdateForm").serialize();
+        $.ajax({
+            type: 'POST',
+            url: '/User/Update',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                if (result.isSuccess) {
+                    $("#pUpdateMesajiModal").text(result.successMessage);
+                    $("#pUpdateMesajiModal").css("color", "green");
 
-                        //var tableRow = table.row(clickedButton.parent());
-                        var rData = [
-                            $("#FirstNameForUpdate").val(),
-                            $("#LastNameForUpdate").val(),
-                            $("#TCForUpdate").val(),
-                            ConvertDateDayMounthYear($("#BirthDateForUpdate").val()),
-                            $("#UserNameForUpdate").val(),
-                            $("#EmailForUpdate").val(),
-                            $("#PhoneNumberForUpdate").val(),
-                            $("#RoleSelectedForUpdate option:selected").text(),
-                            "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + $("#IdForUpdate").val() + "'>Güncelle</button>" +
-                            "<button type='button' class='btn btn-danger btnDelete' data-userid='" + $("#IdForUpdate").val() + "'>Sil</button>"
-                        ];
+                    var rData = [
+                        $("#FirstNameForUpdate").val(),
+                        $("#LastNameForUpdate").val(),
+                        $("#TCForUpdate").val(),
+                        ConvertDateDayMounthYear($("#BirthDateForUpdate").val()),
+                        $("#UserNameForUpdate").val(),
+                        $("#EmailForUpdate").val(),
+                        $("#PhoneNumberForUpdate").val(),
+                        $("#RoleSelectedForUpdate option:selected").text(),
+                        "<button type='button' class='btn btn-primary btnUpdate' data-userid='" + $("#IdForUpdate").val() + "'>Güncelle</button>" +
+                        "<button type='button' class='btn btn-danger btnDelete' data-userid='" + $("#IdForUpdate").val() + "'>Sil</button>"
+                    ];
 
 
-                        table.row(clickedRow)
-                            .data(rData)
-                            .draw();
+                    table.row(clickedRow)
+                        .data(rData)
+                        .draw();
 
 
-                        updateSetTimeOutId = setTimeout(function () { $('#modalUpdate').modal('hide'), $("#pUpdateMesajiModal").text(""); }, 2500);
-                    } else {
-                        $("#pUpdateMesajiModal").text(result.errorMessage);
-                        $("#pUpdateMesajiModal").css("color", "red");
-                    }
-                },
-                error: function () {
-                    $("#pUpdateMesajiModal").text("İşlem sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                    updateSetTimeOutId = setTimeout(function () { $('#modalUpdate').modal('hide'), $("#pUpdateMesajiModal").text(""); }, 2500);
+                } else {
+                    $("#pUpdateMesajiModal").text(result.errorMessage);
                     $("#pUpdateMesajiModal").css("color", "red");
                 }
-            })
+            },
+            error: function () {
+                $("#pUpdateMesajiModal").text("İşlem sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                $("#pUpdateMesajiModal").css("color", "red");
+            }
+        })
 
 
-        }
-        //update model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
-        $('#modalUpdate').on('hide.bs.modal', function () {
+    }
+    //update model kapanma anı.Kullanıcı elle kapatırsa modalı settime out  iptal edilsin!
+    $('#modalUpdate').on('hide.bs.modal', function () {
 
-            $("#pUpdateMesajiModal").text("");
-            clearTimeout(updateSetTimeOutId);
-        });
+        $("#pUpdateMesajiModal").text("");
+        clearTimeout(updateSetTimeOutId);
+    });
 
-        function deleteUser(deleteButton, userid) {
-            $("#pPageMesaj").text("");
+    function deleteUser(deleteButton, userid) {
+        $("#pPageMesaj").text("");
 
-            $.ajax({
-                type: 'POST',
-                url: '/User/Delete',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
-                data: { UserId: userid },
-                success: function (result) {
-                    if (result.isSuccess) {
-                        $("#pPageMesaj").text(result.successMessage);
-                        $("#pPageMesaj").css("color", "green");
-                        //deleteButton.parent().parent().remove();//satırı sil
-                        table.row(clickedRow)
-                            .remove()
-                            .draw();
-                        setTimeout(function () { $("#pPageMesaj").text(""); }, 3000);
-                    } else {
-                        $("#pPageMesaj").text(result.errorMessage);
-                        $("#pPageMesaj").css("color", "red");
-                    }
-                },
-                error: function () {
-                    $("#pPageMesaj").text("Silme işlemi sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+        $.ajax({
+            type: 'POST',
+            url: '/User/Delete',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8', 
+            success: function (result) {
+                if (result.isSuccess) {
+                    $("#pPageMesaj").text(result.successMessage);
+                    $("#pPageMesaj").css("color", "green");
+                    table.row(clickedRow)
+                        .remove()
+                        .draw();
+                    setTimeout(function () { $("#pPageMesaj").text(""); }, 3000);
+                } else {
+                    $("#pPageMesaj").text(result.errorMessage);
                     $("#pPageMesaj").css("color", "red");
                 }
-            })
-        }
+            },
+            error: function () {
+                $("#pPageMesaj").text("Silme işlemi sırasında hata alınmıştır. Hatayı almaya devam ederseniz lütfen yöneticinizle iletişime geçiniz!");
+                $("#pPageMesaj").css("color", "red");
+            }
+        })
+    }
 
-
-                    function ConvertDate(dateObject) {
-                        var d = new Date(dateObject);
-                        var day = d.getDate();
-                        var month = d.getMonth() + 1;
-                        var year = d.getFullYear();
-                        if (day < 10) {
-                            day = "0" + day;
-                        }
-                        if (month < 10) {
-                            month = "0" + month;
-                        }
-                        //var date = day + "-" + month + "-" + year;
-                        var date = year + "-" + month + "-" + day;
-                        return date;
+                //yıl-ay-gün formatında tarihi string döndürür.
+                function ConvertDate(dateObject) {
+                    var d = new Date(dateObject);
+                    var day = d.getDate();
+                    var month = d.getMonth() + 1;
+                    var year = d.getFullYear();
+                    if (day < 10) {
+                        day = "0" + day;
                     }
-
-                     function ConvertDateDayMounthYear(dateObject) {
-                        var d = new Date(dateObject);
-                        var day = d.getDate();
-                        var month = d.getMonth() + 1;
-                        var year = d.getFullYear();
-                        if (day < 10) {
-                            day = "0" + day;
-                        }
-                        if (month < 10) {
-                            month = "0" + month;
-                        }
-                        var date = day + "." + month + "." + year;
-                   
-                        return date;
+                    if (month < 10) {
+                        month = "0" + month;
                     }
+                    var date = year + "-" + month + "-" + day;
+                    return date;
+                }
 
-    </script>
+                //gün.ay.yıl formatında tarihi string döndürür.
+                 function ConvertDateDayMounthYear(dateObject) {
+                    var d = new Date(dateObject);
+                    var day = d.getDate();
+                    var month = d.getMonth() + 1;
+                    var year = d.getFullYear();
+                    if (day < 10) {
+                        day = "0" + day;
+                    }
+                    if (month < 10) {
+                        month = "0" + month;
+                    }
+                    var date = day + "." + month + "." + year;
+
+                    return date;
+                }
+
+</script>
 
 }
 

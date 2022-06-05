@@ -16,10 +16,6 @@ namespace EFCore.Context.Configurations
             userCourse.ToTable("UserCources", "dbo");
             userCourse.HasKey(ur => ur.Id);
             userCourse.HasIndex(e => new { e.UserId, e.CourseId }).IsUnique();
-            //userCourse.HasKey(ur => new { ur.UserId, ur.CourseId });
-
-            //userCourse.Property(e => e.Id).ValueGeneratedOnAdd().UseIdentityColumn();
-
 
 
             userCourse.HasOne(ur => ur.User)

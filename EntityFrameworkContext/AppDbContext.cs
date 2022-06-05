@@ -16,25 +16,17 @@ IdentityRoleClaim<string>, IdentityUserToken<string>>
         }
         public DbSet<Course> Courses { get; set; }
         public DbSet<UserCourse> UserCourses { get; set; }
-        //public DbSet<Flat> Flats { get; set; }
-        //public DbSet<FlatType> FlatTypes { get; set; }
-        //public DbSet<UserType> UserTypes { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            //Şema belirlenmez ise tablo dbo şemasında oluşsun.
             builder.HasDefaultSchema("dbo");
             builder.ApplyConfiguration(new CourseConfiguration());
             builder.ApplyConfiguration(new UserCourseConfiguration());
-            //builder.ApplyConfiguration(new FlatConfiguration());
-            //builder.ApplyConfiguration(new UserTypeConfiguration());
-            //builder.ApplyConfiguration(new FlatTypeConfiguration());
-            //builder.ApplyConfiguration(new BillConfiguration());
-            //builder.ApplyConfiguration(new BillFlatConfiguration());
-            //builder.ApplyConfiguration(new BillTypeConfiguration());
-            //builder.ApplyConfiguration(new MessageConfiguration());
+           
 
-            //builder.HasDefaultSchema("Identity");
             builder.Entity<User>(entity =>
             {
                 entity.ToTable("User", "Identity");

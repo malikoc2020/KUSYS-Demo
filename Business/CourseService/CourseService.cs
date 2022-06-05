@@ -5,6 +5,7 @@ using EFCore.Repository.UnitOfWork;
 
 namespace Business.CourseService
 {
+    //Kursların sisteme girilmesi için kullanılacak servis kodları.
     public class CourseService : ICourseService
     {
         private readonly IRepository<Course> repository;

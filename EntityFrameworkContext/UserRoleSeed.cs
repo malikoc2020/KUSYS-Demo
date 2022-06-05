@@ -4,8 +4,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EFCore.Context
 {
-    public class ContextSeed
+    public class UserRoleSeed
     {
+        //Uygulama ilk ayağa kalktığında Kullanıcılar ve roller burada veritabanına yazılıyor. 
+
+
+
+        //system isimli kullanıcı için tanımlanmış sabit user id. kullanıcısı belli olmayan yada seed olarak oluşturalan satırların inserteduserid olarak bu id kullanılacak.
         public static Guid TanimsizUserId = Guid.Parse("f7882daa-fe0c-4fd1-9656-c2e9426c5fda");
         public static async Task SeedRoleAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
@@ -30,8 +35,6 @@ namespace EFCore.Context
                 TC = "",
                 PictureUrl = "",
                 DefaultRole =""
-
-                //Password = "hKaoJdFbclk=",/*123456*/
             };
             users.Add(SystemUser);
 
@@ -102,16 +105,9 @@ namespace EFCore.Context
                         }
                     }
                     catch (Exception e)
-                    {
-
+                    {//Seed işleminde hata alırsa exception fırlatma. 
                         //throw e;
                     }
-                   /* var result = await userManager.CreateAsync(usr, "Sifre%5");
-                    if (result.Succeeded && !String.IsNullOrEmpty(usr.DefaultRole))
-                    {
-                        await userManager.AddToRoleAsync(usr, usr.DefaultRole);
-                    }
-                   */
                 }
             }
 

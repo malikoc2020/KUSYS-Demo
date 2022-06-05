@@ -21,7 +21,6 @@
         <tr>
             <th scope="col">Ad Soyad</th>
             <th scope="col">EPosta</th>
-   @*         <th scope="col">Telefon</th>*@
             <th scope="col">Kurs</th>
             <th scope="col"></th>
 
@@ -34,7 +33,6 @@
             <tr>
                 <td class="FirstName">@user.FirstName @user.LastName</td>
                 <td class="Email">@user.Email</td>
-           @*     <td class="PhoneNumber">@user.PhoneNumber</td>*@
                 <td class="UserCourses">
                     <table class="table table-hover UserCourseListTable">
 
@@ -126,16 +124,17 @@
                 "language": { "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Turkish.json" }
             });
 
+            //Yeni Kayıt Ekleme
             $(document).on('click', '.btnAdd', function () {
                 clickedButton = $(this);
 
                 let userid = $(this).data("userid");
                 modalEmpty(0, userid);
-                //$('#modal').modal();
                 var myModal = new bootstrap.Modal(document.getElementById('modal'), {keyboard: false});
                 myModal.show();
             });
 
+            //Kayıt Güncelleme
             $(document).on('click', '.btnUpdate', function () {
                 clickedButton = $(this);
 
@@ -147,6 +146,7 @@
                 getUserCourseForUpdate(id);
             });
 
+            //Kayıt Silme
             $(document).on('click', '.btnDelete', function () {
                 if (confirm('Araç Bilgisini Silmek İstediğinizden Emin Misiniz?')) {
                     clickedButton = $(this);
@@ -160,7 +160,8 @@
 
                 $('#UserCourseForm').validate();
 
-                if ($('#UserCourseForm').valid()) {
+                if ($('#UserCourseForm').valid()) //validasyonu geçerse işleme devam et.
+                {
                     addOrUpdateUserCourse();
                 }
             });
@@ -170,8 +171,6 @@
         function modalEmpty(id, userid) {
             $('.field-validation-error').empty();//Daha önce validasyon mesajları gösterilmiş ise onları burada kaldırıyoruz.
 
-            //$("#CourseCode").val("");
-            //$("#Plaka").val("");
             $("#RoleSelectedForUpdate").val(-1);
             $("#Id").val(id);
             $("#UserId").val(userid);
@@ -185,13 +184,13 @@
                 $('#btnSubmit').removeClass("btn-info").addClass("btn-primary");
             }
         }
-
+        //ilgili kaydın en güncel halini veritabanından getir ve popup ekranına yansıt. 
         function getUserCourseForUpdate(id) {
 
             $.ajax({
                 type: 'POST',
                 url: '/UserCourse/GetUserCourse',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', 
                 data: { id: id },
                 success: function (result) {
 
@@ -200,10 +199,8 @@
                         $("#UserId").val(result.data.userId);
                         $("#Id").val(result.data.id);
                          $("#RoleSelectedForUpdate").val(result.data.courseId);
-                        //$("#CourseCode").val(result.data.courseCode);
-                        //$("#Plaka").val(result.data.plaka);
 
-                        //$('#modal').modal();
+                         //modalı aç
                          var myModal = new bootstrap.Modal(document.getElementById('modal'), {keyboard: false});
                             myModal.show();
                     } else {
@@ -237,7 +234,6 @@
                 type: 'POST',
                 url: url,
                 dataType: 'json',
-                //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
                 data: data,
                 success: function (result) {
                     if (result.isSuccess) {
@@ -311,13 +307,14 @@
             $.ajax({
                 type: 'POST',
                 url: '/UserCourse/DeleteUserCourse',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8', 
                 data: { id: id },
                 success: function (result) {
                     if (result.isSuccess) {
                         $("#pPageMesaj").text(result.successMessage);
                         $("#pPageMesaj").css("color", "green");
-                        //deleteButton.parent().parent().remove();//satırı sil
+
+                        //datatable ekranını düzenle.
                         let tableAracCell = clickedButton.parent().parent().parent().parent().parent();
 
 

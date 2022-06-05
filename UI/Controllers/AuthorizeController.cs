@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UI.Controllers
 {
+    //Kimlik doğrulama, Şifre değiştirme, Yetkisiz kullanıcı denemeleri vb işlemler burada işleniyor. 
+
     [Authorize]
     public class AuthorizeController : Controller
     {

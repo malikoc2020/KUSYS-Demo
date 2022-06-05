@@ -15,7 +15,6 @@
         <div class="login-form">
             <form asp-controller="Authorize" asp-action="Login" method="post">
                 @Html.AntiForgeryToken()
-                @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
                 <div class="form-group">
                     <label>EPosta</label>
                     <input asp-for=Email type="text" class="form-control" placeholder="Mail Adresiniz . . .">

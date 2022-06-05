@@ -44,10 +44,23 @@ namespace UI.Controllers
                     var result = await _signInManager.PasswordSignInAsync(userEntity.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation($"{model.Email} Maail user logged in.");
+                        _logger.LogInformation($"{model.Email} Mail user logged in.");
                         return RedirectToAction("Index", "Home");
                     }
+                    else
+                    {
+                        ModelState.AddModelError("Password","Lütfen kullanıcı adınızı yada şifrenizi kontrol ediniz.");
+                    }
                 }
+
+            }
+            else
+            {
+                var validationMessage = string.Join(" | ", ModelState.Values
+           .SelectMany(v => v.Errors)
+           .Select(e => e.ErrorMessage));
+
+                ModelState.AddModelError("Password", validationMessage);
 
             }
             return View(model);

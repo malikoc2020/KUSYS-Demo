@@ -65,10 +65,11 @@ namespace UI.Controllers
             {
                 var currentUser = _userManager.GetUserAsync(User).Result;
 
-                //var sifreKontrol = await _userManager.CheckPasswordAsync(currentUser, model.Password);
+                var passwordValidator = new PasswordValidator<User>();
+                var sifreKontrol = await passwordValidator.ValidateAsync(_userManager, currentUser, model.Password);
 
-                var sifreKontrol = true;//= await _userManager.PasswordValidator.ValidateAsync(model.Password);
-                //var valid = (await UserManager.PasswordValidator.ValidateAsync("pass")).Succeeded;
+
+
 
 
                 if (model.Password != model.RePassword)
@@ -76,7 +77,7 @@ namespace UI.Controllers
                     model.IsSuccess = false;
                     model.Message = "İşlem başarısız. Girilen Şifreler Aynı Değil!";
                 }
-                else if (!sifreKontrol)//Şifre uygunluğu kontrol ediliyor. 
+                else if (!sifreKontrol.Succeeded)//Şifre uygunluğu kontrol ediliyor. 
                 {
                     model.IsSuccess = false;
                     model.Message = "Belirlediğiniz şifre geçerli bir şifre değil. Şifreniz En az 1 büyük harf, küçük harf, rakam, özel karakter içeren en az 6 haneden oluşmalıdır.  ";

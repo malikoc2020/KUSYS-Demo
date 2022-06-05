@@ -37,7 +37,9 @@ namespace Business.DTO
         public int UnLookedMessagesCount { get; set; }
         public List<RoleDTO> Roles { get; set; }
         public UserAddDTO UserAddModel { get; set; }
-  
+
+        public List<UserCourseDTO> UserCourses { get; set; }
+
 
     }
 }
